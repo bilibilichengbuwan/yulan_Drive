@@ -27,3 +27,38 @@ location ~ /\.(ht|git|svn) {
 location ~ ^/(config|core|models|controllers|views|logs|tmp)/ {
     deny all;
 }
+#yulan Drive - Yulan Cloud Disk is an open-source project
+
+## User System
+- Login, registration, password recovery
+
+## File Features
+- Large file upload, chunked upload, file upload
+
+## Sharing Features
+- Share password protection, save to my cloud disk, direct file download
+
+## Environment Requirements
+- PHP 7.4
+- MySQL 5.7+
+
+Nginx requires pseudo-static configuration:
+
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+
+location ~ .php$ {
+    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    include fastcgi_params;
+}
+
+location ~ /.(ht|git|svn) {
+    deny all;
+}
+
+location ~ ^/(config|core|models|controllers|views|logs|tmp)/ {
+    deny all;
+}
