@@ -1,4 +1,4 @@
-#yulan Drive - 欲蓝网盘 / Yulan Cloud Disk is an open-source project
+#yulan Drive - 欲蓝网盘 / Yulan Drive
 
 ## 用户系统 / User System
 - 登录、注册、密码找回 / Login, registration, password recovery
