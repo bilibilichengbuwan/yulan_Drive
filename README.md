@@ -27,6 +27,7 @@ location ~ /\.(ht|git|svn) {
 location ~ ^/(config|core|models|controllers|views|logs|tmp)/ {
     deny all;
 }
+
 #yulan Drive - Yulan Cloud Disk is an open-source project
 
 ## User System
