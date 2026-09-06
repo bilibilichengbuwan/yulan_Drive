@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Never execute or expose application internals / private storage directly.
+RewriteRule ^(?:config|core|models|controllers|views|logs|tmp|storage)(?:/|$) - [F,L,NC]
+RewriteRule ^public/uploads/ - [F,L,NC]
+
+# Route everything else to the front controller when the file/directory does not exist.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
