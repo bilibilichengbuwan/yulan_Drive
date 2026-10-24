@@ -399,7 +399,11 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   #sideMask.on { display: block; }
   .hamburger { display: inline-flex; }
   .topnav .nav-links a:not(.keep) { display: none; }
+  .topnav-inner { gap: 10px; padding: 0 12px; }
+  .topnav .nav-links { gap: 0; }
   .file-name-cell .fname { max-width: 150px; }
+  .card-head { gap: 10px; }
+  .table th, .table td { padding: 9px 10px; }
 }
 
 /* ---------- 工具 ---------- */

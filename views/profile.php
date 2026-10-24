@@ -13,6 +13,7 @@
 <body>
 <nav class="topnav">
     <div class="topnav-inner">
+        <button class="icon-btn hamburger" onclick="openSide()"><i class="fas fa-bars"></i></button>
         <a class="brand" href="/dashboard"><span class="logo"><i class="fas fa-cloud"></i></span><span><?= Helper::e($brand) ?></span></a>
         <div class="nav-links">
             <a href="/dashboard">我的文件</a>

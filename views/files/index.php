@@ -1111,7 +1111,7 @@
 function getCsrfToken() {
     const meta = document.querySelector('meta[name="csrf-token"]');
     if (!meta || !meta.content) {
-        console.error('❌ CSRF Token未找到！请确保HTML中有 <meta name="csrf-token" content="...">');
+        console.error('CSRF Token 未找到！请确保 HTML 中有 <meta name="csrf-token" content="...">');
         return '';
     }
     return meta.content;
@@ -1226,7 +1226,7 @@ function getCsrfToken() {
                 method: 'POST',
                 headers: { 
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken // ✅ 修复点1：添加 CSRF Token 到请求头
+                    'X-CSRF-TOKEN': csrfToken // 修复点1：添加 CSRF Token 到请求头
                 },
                 body: formData
             })
@@ -1317,7 +1317,7 @@ function startChunkUpload() {
             method: 'POST',
             headers: { 
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken // ✅ 修复点2：添加 CSRF Token 到请求头
+                'X-CSRF-TOKEN': csrfToken // 修复点2：添加 CSRF Token 到请求头
             },
             body: formData
         })

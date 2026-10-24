@@ -1,4 +1,22 @@
 
+/* 移动端侧栏抽屉开关（个人中心 / 后台 / 前台通用） */
+function openSide() {
+    var s = document.getElementById('sidebar');
+    var m = document.getElementById('sideMask');
+    if (s) s.classList.add('open');
+    if (m) m.classList.add('on');
+}
+function closeSide() {
+    var s = document.getElementById('sidebar');
+    var m = document.getElementById('sideMask');
+    if (s) s.classList.remove('open');
+    if (m) m.classList.remove('on');
+}
+(function () {
+    var m = document.getElementById('sideMask');
+    if (m) m.addEventListener('click', closeSide);
+})();
+
 function openModal(id) {
     var m = document.getElementById(id);
     if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }

@@ -16,9 +16,16 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
     <style>
         .layout { padding: 24px 32px; }
         .sidebar { width: 200px; position: sticky; top: calc(var(--nav-h) + 24px); }
-        @media (max-width: 992px) {
+        @media (max-width: 860px) {
             .layout { padding: 16px; flex-direction: column; }
-            .sidebar { width: 100%; position: static; }
+            .sidebar {
+                position: fixed; inset: 0 auto 0 0; top: var(--nav-h);
+                width: 264px; max-width: 82vw; z-index: 220;
+                background: var(--card); border-right: 1px solid var(--line);
+                padding: 14px; overflow-y: auto;
+                transform: translateX(-100%); transition: transform .2s ease;
+            }
+            .sidebar.open { transform: none; box-shadow: 0 8px 32px rgba(0,0,0,.2); }
         }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px 18px; }
         .field-hint { font-size: 12px; color: var(--text-3); margin-top: 5px; }
@@ -27,9 +34,10 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
 <body>
 <nav class="topnav">
     <div class="topnav-inner" style="max-width:none">
+        <button class="icon-btn hamburger" onclick="openSide()"><i class="fas fa-bars"></i></button>
         <a class="brand" href="/admin"><span class="logo" style="background:var(--text)"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
         <div class="nav-links">
-            <a href="/">返回前台</a>
+            <a class="keep" href="/">返回前台</a>
         </div>
         <div class="spacer"></div>
         <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
@@ -37,7 +45,7 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
 </nav>
 
 <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="side-card">
             <a class="side-link" href="/admin"><i class="fas fa-tachometer-alt"></i>仪表盘</a>
             <a class="side-link" href="/admin/users"><i class="fas fa-users"></i>用户管理</a>
@@ -47,6 +55,7 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
             <a class="side-link active" href="/admin/settings"><i class="fas fa-cogs"></i>系统设置</a>
         </div>
     </aside>
+    <div id="sideMask"></div>
 
     <main class="main">
         <div id="toast"></div>
@@ -146,7 +155,7 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
                 <table class="table" style="max-width:560px">
                     <tr><td class="muted" style="width:140px">当前驱动</td><td><?= $driver === 's3' ? '对象存储（S3）' : '本地磁盘' ?></td></tr>
                     <tr><td class="muted">PHP 版本</td><td><?= phpversion() ?></td></tr>
-                    <tr><td class="muted">GD / zip</td><td><?= extension_loaded('gd') ? 'gd ✓' : 'gd ✗' ?> · <?= class_exists('ZipArchive') ? 'zip ✓' : 'zip ✗' ?></td></tr>
+                    <tr><td class="muted">GD / zip</td><td><?= extension_loaded('gd') ? 'gd 正常' : 'gd 缺失' ?> · <?= class_exists('ZipArchive') ? 'zip 正常' : 'zip 缺失' ?></td></tr>
                     <tr><td class="muted">服务器</td><td><?= php_uname('s') ?></td></tr>
                 </table>
             </div>
@@ -194,9 +203,9 @@ function testStorage() {
     var box = document.getElementById('storageResult');
     box.textContent = '正在连接…'; box.style.color = 'var(--text-2)';
     apiPost('/api/admin/storage-test', s3Payload(), function (json) {
-        box.textContent = '✓ 连接成功：' + json.data.bucket; box.style.color = 'var(--ok)';
+        box.textContent = '连接成功：' + json.data.bucket; box.style.color = 'var(--ok)';
     }, function (json) {
-        box.textContent = '✗ 连接失败：' + json.message; box.style.color = 'var(--danger)';
+        box.textContent = '连接失败：' + json.message; box.style.color = 'var(--danger)';
     });
 }
 function saveStorage() {
