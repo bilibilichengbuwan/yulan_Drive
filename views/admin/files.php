@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
 header('Content-Type: text/html; charset=utf-8');
 $brand = Setting::getBrandName();
 ?>
@@ -10,6 +10,7 @@ $brand = Setting::getBrandName();
     <title>管理后台 - <?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/app-admin.css">
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -343,6 +344,7 @@ $brand = Setting::getBrandName();
 
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid d-flex justify-content-between align-items-center">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminNav"><i class="fas fa-bars"></i></button>
         <a class="navbar-brand" href="/admin">
             <i class="fas fa-cog"></i> 管理后台
         </a>
@@ -352,9 +354,11 @@ $brand = Setting::getBrandName();
             </a>
         </div>
     </div>
-</nav>
+    </nav>
 
-<div class="d-flex">
+    <?php $activeMenu = 'files'; include __DIR__ . '/../partials/admin_offcanvas.php'; ?>
+
+    <div class="d-flex">
     <div class="sidebar">
         <div class="menu-label">导航</div>
         <a href="/admin" class="menu-item">

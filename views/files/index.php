@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <title>我的文件 - <?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/drawer.css">
     <style>
         /* 基础样式重置和变量定义 */
         :root {
@@ -347,8 +348,10 @@
             gap: 8px;
             color: var(--text);
             font-weight: 500;
+            min-width: 0;
         }
-        .file-table .file-name i { font-size: 18px; width: 22px; text-align: center; color: var(--text-secondary); }
+        .file-table .file-name i { font-size: 18px; width: 22px; text-align: center; color: var(--text-secondary); flex-shrink: 0; }
+        .file-table .file-name .fname-text { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
         .file-table .file-name .folder-icon { color: #f5b342; }
         .file-table .file-size { color: var(--text-secondary); font-size: 13px; }
         .file-table .file-time { color: var(--text-light); font-size: 12px; }
@@ -582,6 +585,17 @@
             .file-table .file-actions .btn-sm span {
                 display: none;
             }
+            /* 长文件名自动换行：固定列布局，名称列吃剩余宽度并换行，操作列 4 个按钮始终可见 */
+            .file-table table { table-layout: fixed; }
+            .file-table th:nth-child(1),
+            .file-table td:nth-child(1) { width: 34px; }
+            .file-table th:nth-child(2),
+            .file-table td:nth-child(2) { width: auto; }
+            .file-table th:nth-child(5),
+            .file-table td:nth-child(5) { width: 128px; }
+            .file-table td:nth-child(2) { word-break: break-word; overflow-wrap: anywhere; }
+            .file-table .file-actions { flex-wrap: nowrap; }
+            .file-table .file-actions .btn-sm { flex-shrink: 0; }
             .modal-box {
                 width: 95vw;
                 max-height: 95vh;
@@ -614,8 +628,9 @@
 </head>
 <body>
 
-<nav class="navbar-custom">
-    <a class="navbar-brand" href="/">
+    <nav class="navbar-custom">
+        <button class="drawer-toggle" data-drawer-toggle><i class="fas fa-bars"></i></button>
+        <a class="navbar-brand" href="/">
         <i class="fas fa-cloud"></i>
         <span><?= Helper::e($brand) ?></span>
     </a>
@@ -752,9 +767,9 @@
                                 <td><input type="checkbox" class="file-checkbox" value="<?= $file['id'] ?>" onchange="updateBatchActions()"></td>
                                 <td>
                                     <?php if ($file['type'] == 'folder'): ?>
-                                        <a href="/files?folder=<?= $file['id'] ?>" class="file-name"><i class="fas fa-folder folder-icon"></i><?= Helper::e($file['name']) ?></a>
+                                        <a href="/files?folder=<?= $file['id'] ?>" class="file-name"><i class="fas fa-folder folder-icon"></i><span class="fname-text"><?= Helper::e($file['name']) ?></span></a>
                                     <?php else: ?>
-                                        <a href="/preview?id=<?= $file['id'] ?>" class="file-name"><?= Helper::getFileIcon($file['name']) ?> <?= Helper::e($file['name']) ?></a>
+                                        <a href="/preview?id=<?= $file['id'] ?>" class="file-name"><?= Helper::getFileIcon($file['name']) ?> <span class="fname-text"><?= Helper::e($file['name']) ?></span></a>
                                     <?php endif; ?>
                                 </td>
                                 <td class="file-size"><?= $file['type'] == 'file' ? Helper::formatSize($file['size']) : '-' ?></td>
@@ -1266,6 +1281,8 @@ function batchDownload() {
     xhr.open('POST', '/api/batch-download', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    if (csrfMeta) xhr.setRequestHeader('X-CSRF-Token', csrfMeta.content);
     xhr.responseType = 'blob';
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
@@ -1337,5 +1354,23 @@ function batchDownload() {
 })();
 </script>
 
+<div class="app-drawer-backdrop" id="appDrawerBackdrop"></div>
+<aside class="app-drawer" id="appDrawer">
+    <div class="drawer-head">
+        <span class="drawer-brand"><i class="fas fa-cloud"></i><?= Helper::e($brand) ?></span>
+        <button class="drawer-close" data-drawer-close>&times;</button>
+    </div>
+    <div class="drawer-body">
+        <a class="drawer-item" href="/files?folder=0"><i class="fas fa-folder-open"></i>全部文件</a>
+        <a class="drawer-item" href="/files?folder=0&sort=created_at DESC"><i class="fas fa-clock"></i>最近上传</a>
+        <a class="drawer-item active" href="/trash"><i class="fas fa-trash"></i>回收站</a>
+        <a class="drawer-item" href="/share/my"><i class="fas fa-share-alt"></i>我的分享</a>
+        <div class="drawer-divider"></div>
+        <a class="drawer-item" href="javascript:void(0)" onclick="document.getElementById('fileInput').click()"><i class="fas fa-upload"></i>上传文件</a>
+        <a class="drawer-item" href="javascript:void(0)" onclick="showCreateFolder()"><i class="fas fa-folder-plus"></i>新建文件夹</a>
+        <a class="drawer-item" href="/logout"><i class="fas fa-sign-out-alt"></i>退出登录</a>
+    </div>
+</aside>
+<script src="/js/drawer.js"></script>
 </body>
 </html>

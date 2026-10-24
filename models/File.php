@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class File extends Model {
     protected $table = 'files';
@@ -239,6 +239,43 @@ class File extends Model {
         }
         
         $db->execute("DELETE FROM upload_chunks WHERE file_md5 = ?", [$md5]);
+    }
+
+    /**
+     * 永久删除一个节点（文件或文件夹，递归处理子项）。
+     *
+     * 与 forceDelete 保持一致的语义：
+     *  - 文件：扣减所有者 storage_used；
+     *  - 仅当没有任何其他记录（含其他用户通过秒传/转存共享同一物理文件）引用该 md5 时才删除物理文件，
+     *    避免误删他人仍在使用的文件；
+     *  - 删除数据库记录。
+     */
+    public function permanentDeleteNode($node) {
+        if (!$node || empty($node['id'])) {
+            return false;
+        }
+
+        if ($node['type'] === 'folder') {
+            $children = $this->findAll('parent_id = ?', [$node['id']]);
+            foreach ($children as $child) {
+                $this->permanentDeleteNode($child);
+            }
+        } elseif ($node['type'] === 'file') {
+            $userModel = new User();
+            $userModel->updateStorageUsed($node['user_id'], -(int)$node['size']);
+
+            $refCount = (int)$this->db->fetchOne(
+                "SELECT COUNT(*) AS c FROM files WHERE md5 = ? AND id != ?",
+                [$node['md5'], $node['id']]
+            )['c'];
+
+            if ($refCount === 0 && !empty($node['path']) && file_exists($node['path'])) {
+                @unlink($node['path']);
+                $this->deleteChunks($node['md5']);
+            }
+        }
+
+        return $this->delete($node['id']);
     }
     
     

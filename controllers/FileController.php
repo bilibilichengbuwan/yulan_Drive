@@ -135,6 +135,9 @@ class FileController extends Controller {
         if (in_array($ext, $dangerousExts)) {
             $this->error('不允许上传可执行文件');
         }
+        if (!empty($ext) && !$this->isAllowedExtension($ext)) {
+            $this->error('该文件类型不被允许上传');
+        }
 
         $userModel = new User();
         if (!$userModel->checkStorage(Session::getUserId(), $file['size'])) {
@@ -250,6 +253,9 @@ class FileController extends Controller {
         $dangerousExts = ['php','php3','php4','php5','php7','php8','phtml','pht','phar','phps','cgi','pl','py','sh','bash','bat','cmd','com','exe','msi','jar','war','jsp','jspx'];
         if (in_array($ext, $dangerousExts, true)) {
             $this->error('不允许上传可执行文件');
+        }
+        if (!empty($ext) && !$this->isAllowedExtension($ext)) {
+            $this->error('该文件类型不被允许上传');
         }
 
         $chunk = $_FILES['chunk'];
@@ -457,6 +463,8 @@ class FileController extends Controller {
     }
 
     public function fileContent() {
+        // 清理启动阶段可能残留的输出缓冲（如历史上 BOM 造成的杂字节），避免污染二进制图片/媒体流
+        while (ob_get_level()) ob_end_clean();
         $fileId = (int)$this->get('id', 0);
         $file = $this->fileModel->find($fileId);
         if (!$file || (int)$file['user_id'] !== (int)Session::getUserId() || (int)$file['is_deleted'] === 1 || $file['type'] !== 'file') $this->error('文件不存在或无权访问', 404);
@@ -682,6 +690,16 @@ class FileController extends Controller {
     }
     
     
+    private function isAllowedExtension($ext) {
+        $config = require __DIR__ . '/../config/app.php';
+        $allowed = $config['upload_allowed_types'] ?? [];
+        if (empty($allowed) || !is_array($allowed)) {
+            return true; // 未配置白名单则仅依赖黑名单
+        }
+        return in_array($ext, $allowed, true);
+    }
+
+
     private function getUploadError($error) {
         $errors = [
             UPLOAD_ERR_INI_SIZE => '文件大小超过服务器限制',

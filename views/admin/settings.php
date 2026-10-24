@@ -12,16 +12,20 @@ $settings = isset($settings) ? $settings : array();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/app-admin.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/admin"><i class="fas fa-cog"></i> 管理后台</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminNav" style="color:#fff;"><i class="fas fa-bars"></i></button>
+        <a class="navbar-brand" href="/admin"><i class="fas fa-cog"></i> 管理后台</a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="/"><i class="fas fa-home"></i> 返回前台</a>
             </div>
         </div>
     </nav>
+
+    <?php $activeMenu = 'settings'; include __DIR__ . '/../partials/admin_offcanvas.php'; ?>
 
     <div class="container-fluid mt-3">
         <div class="row">

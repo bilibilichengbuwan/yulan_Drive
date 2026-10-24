@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class Mailer {
     
@@ -58,7 +58,13 @@ class Mailer {
     
     public static function send($to, $subject, $htmlBody) {
         self::init();
-        
+
+        // 未配置真实 SMTP（仍为默认占位 host）时，直接降级到本地日志，
+        // 避免向占位地址发起真实网络连接（在部分环境下会导致异常/超时）。
+        if (empty(self::$config['host']) || self::$config['host'] === 'smtp.example.com') {
+            return self::devDump($to, $subject, $htmlBody);
+        }
+
         $errno = 0;
         $errstr = '';
 
@@ -78,7 +84,7 @@ class Mailer {
         
         if (!$fp) {
             error_log("SMTP连接失败: {$errstr} ({$errno})");
-            return false;
+            return self::devDump($to, $subject, $htmlBody);
         }
         
         error_log("SMTP连接成功");
@@ -146,5 +152,24 @@ class Mailer {
         
         error_log("邮件发送完成");
         return true;
+    }
+
+
+    /**
+     * 开发/测试降级：当 SMTP 未真正配置（仍为默认占位 host）时，
+     * 将验证码邮件内容写入本地 storage/mail_dev.log，便于本地调试注册/找回密码流程。
+     * 真实生产环境配置了可用 SMTP 时不会进入此分支。
+     */
+    private static function devDump($to, $subject, $body) {
+        if (empty(self::$config['host']) || self::$config['host'] === 'smtp.example.com') {
+            $dir = __DIR__ . '/../storage';
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            $line = '[' . date('Y-m-d H:i:s') . "] TO:{$to} SUBJECT:{$subject}\nBODY:\n{$body}\n---\n";
+            @file_put_contents($dir . '/mail_dev.log', $line, FILE_APPEND);
+            return true;
+        }
+        return false;
     }
 }

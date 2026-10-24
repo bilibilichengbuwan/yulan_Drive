@@ -28,7 +28,12 @@ class AuthController extends Controller {
     public function login() {
         $email = $this->post('email');
         $password = $this->post('password');
-        
+
+        $ip = Helper::getClientIp();
+        if (!RateLimiter::check('login_ip:' . $ip, 20, 600)) {
+            $this->error('尝试次数过多，请 10 分钟后再试');
+        }
+
         if (empty($email) || empty($password)) {
             $this->error('请输入用户名和密码');
         }
@@ -68,6 +73,7 @@ class AuthController extends Controller {
         $password = $this->post('password');
         $confirmPassword = $this->post('confirm_password');
         $verifyCode = $this->post('verify_code');
+        $ip = Helper::getClientIp();
 
         if (empty($username) || empty($email) || empty($password)) {
             $this->error('请填写完整信息');
@@ -93,7 +99,15 @@ class AuthController extends Controller {
             $this->error('两次密码不一致');
         }
 
+        if (RateLimiter::count('verifyfail_email:' . $email, 900) >= 5) {
+            $this->error('验证码尝试次数过多，请 15 分钟后再试');
+        }
+        if (RateLimiter::count('verifyfail_ip:' . $ip, 900) >= 20) {
+            $this->error('请求过于频繁，请稍后再试');
+        }
         if (!$this->verifyEmailCode($email, $verifyCode, 'register')) {
+            RateLimiter::check('verifyfail_email:' . $email, 100, 900);
+            RateLimiter::check('verifyfail_ip:' . $ip, 1000, 900);
             $this->error('验证码错误或已过期');
         }
 
@@ -146,18 +160,21 @@ class AuthController extends Controller {
             }
         }
 
-        $db = Database::getInstance();
-        $recentCode = $db->fetchOne(
-            "SELECT id FROM verify_codes WHERE email = ? AND type = ? AND created_at > DATE_SUB(NOW(), INTERVAL 1 MINUTE)",
-            [$email, $type]
-        );
-        if ($recentCode) {
+        $ip = Helper::getClientIp();
+        if (!RateLimiter::check('sendcode_email_min:' . $email, 1, 60)) {
             $this->error('发送过于频繁，请稍后再试');
+        }
+        if (!RateLimiter::check('sendcode_email_hour:' . $email, 10, 3600)) {
+            $this->error('该邮箱发送次数过多，请稍后再试');
+        }
+        if (!RateLimiter::check('sendcode_ip:' . $ip, 30, 3600)) {
+            $this->error('请求过于频繁，请稍后再试');
         }
 
         $code = Helper::randomCode(6);
         $expireAt = date('Y-m-d H:i:s', strtotime('+5 minutes'));
 
+        $db = Database::getInstance();
         $db->insert(
             "INSERT INTO verify_codes (email, code, type, expire_at) VALUES (?, ?, ?, ?)",
             [$email, $code, $type, $expireAt]
@@ -208,12 +225,21 @@ class AuthController extends Controller {
         $email = $this->post('email');
         $password = $this->post('password');
         $verifyCode = $this->post('verify_code');
+        $ip = Helper::getClientIp();
         
         if (empty($email) || empty($password) || empty($verifyCode)) {
             $this->error('请填写完整信息');
         }
         
+        if (RateLimiter::count('verifyfail_email:' . $email, 900) >= 5) {
+            $this->error('验证码尝试次数过多，请 15 分钟后再试');
+        }
+        if (RateLimiter::count('verifyfail_ip:' . $ip, 900) >= 20) {
+            $this->error('请求过于频繁，请稍后再试');
+        }
         if (!$this->verifyEmailCode($email, $verifyCode, 'reset_password')) {
+            RateLimiter::check('verifyfail_email:' . $email, 100, 900);
+            RateLimiter::check('verifyfail_ip:' . $ip, 1000, 900);
             $this->error('验证码错误或已过期');
         }
         

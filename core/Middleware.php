@@ -43,8 +43,10 @@ class Middleware {
     
     public static function csrf() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-            if (!hash_equals((string)Session::get('csrf_token', ''), (string)$token)) {
+            $expected = (string)Session::get('csrf_token', '');
+            $token = (string)($_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));
+            // 拒绝缺失或未生成令牌的请求，避免空令牌误过 hash_equals('', '')
+            if ($expected === '' || !hash_equals($expected, $token)) {
                 Helper::error('CSRF验证失败', 403);
                 return false;
             }

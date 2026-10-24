@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class AdminController extends Controller {
     
@@ -129,13 +129,12 @@ class AdminController extends Controller {
         }
 
         $db = Database::getInstance();
-        $files = $db->fetchAll("SELECT path FROM files WHERE user_id = ? AND type = 'file'", [$userId]);
+        $fileModel = new File();
+        $files = $db->fetchAll("SELECT * FROM files WHERE user_id = ?", [$userId]);
         foreach ($files as $f) {
-            if (!empty($f['path']) && file_exists($f['path'])) {
-                @unlink($f['path']);
-            }
+            // 安全删除：自动处理配额扣减，且仅在 md5 无其他引用时才删除物理文件
+            $fileModel->permanentDeleteNode($f);
         }
-        $db->execute("DELETE FROM files WHERE user_id = ?", [$userId]);
         $db->execute("DELETE FROM shares WHERE user_id = ?", [$userId]);
         $db->execute("DELETE FROM operation_logs WHERE user_id = ?", [$userId]);
         $db->execute("DELETE FROM download_tokens WHERE user_id = ?", [$userId]);

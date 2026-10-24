@@ -1,0 +1,16 @@
+# 运行时目录
+/logs/
+/tmp/
+
+# 用户上传文件（仅保留目录占位 .gitkeep，不提交真实文件）
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+storage/mail_dev.log
+
+# 安装锁（每实例独有）
+/config/installed.lock
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+*.log

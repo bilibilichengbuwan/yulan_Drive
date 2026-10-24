@@ -53,6 +53,7 @@ require_once __DIR__ . '/core/Router.php';
 require_once __DIR__ . '/core/Session.php';
 require_once __DIR__ . '/core/Mailer.php';
 require_once __DIR__ . '/core/Middleware.php';
+require_once __DIR__ . '/core/RateLimiter.php';
 require_once __DIR__ . '/core/Installer.php';
 require_once __DIR__ . '/models/Model.php';
 require_once __DIR__ . '/models/User.php';
@@ -75,18 +76,17 @@ if ($lastCleanup !== $today) {
     $trashDays = max(1, (int)Setting::get('trash_days', '7'));
     $cutoff = date('Y-m-d H:i:s', strtotime("-{$trashDays} days"));
     $db = Database::getInstance();
-    $expiredFiles = $db->fetchAll("SELECT id, path, user_id FROM files WHERE is_deleted = 1 AND deleted_at IS NOT NULL AND deleted_at < ?", [$cutoff]);
+    $expiredFiles = $db->fetchAll("SELECT id, type, path, user_id, size, md5 FROM files WHERE is_deleted = 1 AND deleted_at IS NOT NULL AND deleted_at < ?", [$cutoff]);
     if (!empty($expiredFiles)) {
+        $fileModel = new File();
         foreach ($expiredFiles as $f) {
-            if (!empty($f['path']) && file_exists($f['path'])) {
-                @unlink($f['path']);
-            }
-            $db->execute("DELETE FROM shares WHERE file_id = ?", [$f['id']]);
-            $db->execute("DELETE FROM download_tokens WHERE file_id = ?", [$f['id']]);
+            // 永久删除：扣减所有者存储配额，且仅在 md5 无其他记录引用时才删除物理文件（防止误删他人文件）
+            $fileModel->permanentDeleteNode($f);
         }
         $ids = array_column($expiredFiles, 'id');
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $db->execute("DELETE FROM files WHERE id IN ({$placeholders})", $ids);
+        $db->execute("DELETE FROM shares WHERE file_id IN ({$placeholders})", $ids);
+        $db->execute("DELETE FROM download_tokens WHERE file_id IN ({$placeholders})", $ids);
     }
     Setting::set('trash_cleanup_last_run', $today);
 }
@@ -232,6 +232,8 @@ Router::post('/api/move', function() {
 }, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
 
 Router::post('/api/batch-download', function() {
+    // 清理启动阶段残留输出缓冲，保证 zip 二进制流不被污染
+    while (ob_get_level()) ob_end_clean();
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
     $ids = $input['ids'] ?? [];
     if (empty($ids) || !is_array($ids)) {
@@ -293,11 +295,11 @@ Router::post('/api/share/cancel', function() {
 
 Router::post('/api/share/verify', function() {
     (new ShareController())->verifyPassword();
-});
+}, [[Middleware::class, 'csrf']]);
 
 Router::post('/api/share/download-token', function() {
     (new ShareController())->getDownloadToken();
-});
+}, [[Middleware::class, 'csrf']]);
 
 Router::post('/api/share/save', function() {
     (new ShareController())->saveToDisk();
@@ -327,14 +329,13 @@ Router::post('/api/delete-account', function() {
     $db = Database::getInstance();
     $userId = Session::getUserId();
     
-    $files = $db->fetchAll("SELECT path FROM files WHERE user_id = ? AND type = 'file'", [$userId]);
+    $fileModel = new File();
+    $files = $db->fetchAll("SELECT * FROM files WHERE user_id = ?", [$userId]);
     foreach ($files as $file) {
-        if (!empty($file['path']) && file_exists($file['path'])) {
-            @unlink($file['path']);
-        }
+        // 安全删除：扣减配额，且仅在 md5 无其他引用时删除物理文件（保护共享物理文件的其他用户）
+        $fileModel->permanentDeleteNode($file);
     }
     
-    $db->execute("DELETE FROM files WHERE user_id = ?", [$userId]);
     $db->execute("DELETE FROM shares WHERE user_id = ?", [$userId]);
     $db->execute("DELETE FROM operation_logs WHERE user_id = ?", [$userId]);
     $db->execute("DELETE FROM download_tokens WHERE user_id = ?", [$userId]);
@@ -422,7 +423,7 @@ Router::post('/api/admin/add-user', function() {
     $log->addLog('admin_add_user', 'user', null, "管理员添加用户: {$username}");
     
     Helper::success('用户添加成功');
-});
+}, [[Middleware::class, 'admin'], [Middleware::class, 'csrf']]);
 
 Router::post('/api/admin/update-user', function() {
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
@@ -446,7 +447,7 @@ Router::post('/api/admin/update-user', function() {
     $log->addLog('admin_update_user', 'user', $userId, "管理员调整用户配额: {$user['username']} -> {$storageGb}GB");
     
     Helper::success('配额已更新');
-});
+}, [[Middleware::class, 'admin'], [Middleware::class, 'csrf']]);
 
 Router::post('/api/admin/save-settings', function() {
     (new AdminController())->settings();

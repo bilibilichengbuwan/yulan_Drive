@@ -1,4 +1,4 @@
-﻿<?php $brand = Setting::getBrandName(); ?>
+<?php $brand = Setting::getBrandName(); ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>操作日志 - <?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/app-admin.css">
     <style>
         * { box-sizing: border-box; }
         .d-flex { display: flex; }
@@ -178,6 +180,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid d-flex justify-content-between align-items-center">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminNav"><i class="fas fa-bars"></i></button>
         <a class="navbar-brand" href="/">
             <i class="fas fa-cloud"></i>
             <?= Helper::e($brand) ?>
@@ -186,9 +189,11 @@
             <a class="nav-link" href="/admin"><i class="fas fa-arrow-left"></i><span class="d-none d-md-inline"> 返回</span></a>
         </div>
     </div>
-</nav>
+    </nav>
 
-<div class="d-flex">
+    <?php $activeMenu = 'logs'; include __DIR__ . '/../partials/admin_offcanvas.php'; ?>
+
+    <div class="d-flex">
     <div class="sidebar">
         <div class="menu-label">管理</div>
         <a href="/admin" class="menu-item">
@@ -310,5 +315,6 @@
 </div>
 
 <script src="/js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

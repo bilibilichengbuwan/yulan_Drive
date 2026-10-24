@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class Controller {
     protected $viewPath = __DIR__ . '/../views/';
@@ -23,7 +23,17 @@ class Controller {
             $layoutFile = $this->viewPath . 'layouts/main.php';
             $content = str_replace('{{layout}}', $content, file_get_contents($layoutFile));
         }
-        
+
+        // 统一注入 CSRF Token 的 meta 标签：确保所有页面（含此前缺失令牌的后台页面）
+        // 都能通过前端 JS 携带令牌，使 CSRF 防护真正生效。
+        $csrfToken = Middleware::generateCsrfToken();
+        $csrfMeta = '<meta name="csrf-token" content="' . htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') . '">';
+        if (stripos($content, '</head>') !== false) {
+            $content = preg_replace('/<\/head>/i', $csrfMeta . "\n</head>", $content, 1);
+        } else {
+            $content .= $csrfMeta;
+        }
+
         echo $content;
     }
     

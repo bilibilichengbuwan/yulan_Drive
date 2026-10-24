@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class Log extends Model {
     protected $table = 'operation_logs';
