@@ -6,728 +6,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#f5f6f8">
     <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
-    <link rel="stylesheet" href="/css/style.css">
     <title>我的文件 - <?= Helper::e($brand) ?></title>
+    <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/drawer.css">
     <script src="/js/theme.js"></script>
-    <style>
-        /* 基础样式重置和变量定义（v1.0.4 扁平化，支持暗色） */
-        :root {
-            --primary: #2f6fed;
-            --primary-dark: #1e5ed8;
-            --primary-light: #eef3fe;
-            --bg: #f5f6f8;
-            --card: #ffffff;
-            --text: #22252a;
-            --text-secondary: #5c6470;
-            --text-light: #9aa3b0;
-            --border: #e4e7ec;
-            --shadow: 0 1px 2px rgba(16, 24, 40, .05);
-            --radius: 8px;
-            --radius-sm: 6px;
-            --transition: 0.15s ease;
-            --sidebar-width: 230px;
-            --nav-height: 56px;
-        }
-        [data-theme="dark"] {
-            --primary: #6b9aff;
-            --primary-dark: #5288f2;
-            --primary-light: #1d2a45;
-            --bg: #14161a;
-            --card: #1d2025;
-            --text: #e6e8eb;
-            --text-secondary: #a3abb8;
-            --text-light: #6d7683;
-            --border: #2c3037;
-            --shadow: 0 1px 2px rgba(0, 0, 0, .3);
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        a { text-decoration: none; color: inherit; }
-        button { cursor: pointer; font-family: inherit; font-size: 13px; border: none; background: none; color: var(--text); }
-        input, select { font-family: inherit; font-size: 13px; outline: none; }
-        
-        /* 导航栏 */
-        .navbar-custom {
-            height: var(--nav-height);
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
-        }
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 18px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .navbar-right {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .nav-link {
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .nav-link:hover { background: var(--bg); color: var(--text); }
-        .user-dropdown { position: relative; margin-left: 8px; }
-        .avatar-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 10px 4px 14px;
-            border-radius: 30px;
-            background: var(--bg);
-            border: 1px solid transparent;
-            transition: var(--transition);
-        }
-        .avatar-btn:hover { border-color: var(--border); background: #eef2f6; }
-        .avatar-btn .username {
-            font-weight: 500;
-            font-size: 13px;
-            color: var(--text);
-            max-width: 80px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .avatar-btn .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: calc(100% + 8px);
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            min-width: 180px;
-            padding: 6px 0;
-            border: 1px solid var(--border);
-            z-index: 200;
-        }
-        .dropdown-menu.show { display: block; }
-        .dropdown-menu a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 18px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            transition: var(--transition);
-        }
-        .dropdown-menu a:hover { background: var(--bg); color: var(--text); }
-        .dropdown-menu .divider { height: 1px; background: var(--border); margin: 4px 12px; }
-        
-        /* 主布局 */
-        .app-wrapper {
-            display: flex;
-            min-height: calc(100vh - var(--nav-height));
-        }
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            padding: 20px 14px;
-            flex-shrink: 0;
-            height: calc(100vh - var(--nav-height));
-            position: sticky;
-            top: var(--nav-height);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .sidebar .menu-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-light);
-            padding: 12px 10px 4px;
-            font-weight: 600;
-        }
-        .sidebar .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            transition: var(--transition);
-            font-size: 13px;
-        }
-        .sidebar .menu-item:hover { background: var(--bg); color: var(--text); }
-        .sidebar .menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 500; }
-        .sidebar .menu-item i { width: 18px; text-align: center; font-size: 14px; }
-        .sidebar .btn-action {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            background: transparent;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            font-size: 13px;
-            width: 100%;
-            text-align: left;
-        }
-        .sidebar .btn-action:hover { background: var(--bg); color: var(--text); }
-        .sidebar .btn-action i { width: 18px; text-align: center; font-size: 14px; }
-        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
-        .storage-wrap { margin-top: auto; padding: 12px 12px 0; }
-        .storage-wrap .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
-        .storage-bar { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
-        .storage-bar .storage-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s ease; }
-        .storage-text { font-size: 12px; color: var(--text-light); margin-top: 4px; }
-        
-        /* 主内容区 */
-        .main-content {
-            flex: 1;
-            padding: 20px 28px 40px;
-            min-width: 0;
-            position: relative;
-            background: var(--bg);
-        }
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 20px;
-            background: var(--card);
-            padding: 12px 18px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        .breadcrumb a { color: var(--primary); transition: var(--transition); }
-        .breadcrumb a:hover { color: var(--primary-dark); }
-        .breadcrumb .active { color: var(--text); font-weight: 500; }
-        .breadcrumb .sep { color: var(--text-light); }
-        .actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .actions .search-box {
-            padding: 6px 12px 6px 32px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--bg);
-            font-size: 13px;
-            width: 180px;
-            transition: var(--transition);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b98a9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: 10px center;
-        }
-        .actions .search-box:focus { border-color: var(--primary); background-color: #fff; width: 220px; }
-        .actions .sort-select {
-            padding: 6px 28px 6px 12px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--bg);
-            font-size: 13px;
-            color: var(--text);
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b98a9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            cursor: pointer;
-        }
-        .actions .sort-select:focus { border-color: var(--primary); }
-        .actions .btn {
-            padding: 6px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 500;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: var(--bg);
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-        }
-        .actions .btn:hover { background: #eef2f6; color: var(--text); }
-        .actions .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .actions .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
-        
-        /* 批量操作栏 */
-        #batch-actions {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        #batch-actions.show { display: flex; }
-        #batch-actions .selected-count { font-size: 13px; color: var(--text-secondary); margin-right: 8px; }
-        #batch-actions .batch-btn {
-            padding: 5px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            background: var(--bg);
-            color: var(--text-secondary);
-            transition: var(--transition);
-            border: 1px solid transparent;
-        }
-        #batch-actions .batch-btn:hover { background: #eef2f6; color: var(--text); }
-        #batch-actions .batch-btn.danger { color: #e5484d; }
-        #batch-actions .batch-btn.danger:hover { background: #fef2f2; }
-        
-        /* 文件表格 */
-        .file-table {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-        .file-table table { width: 100%; border-collapse: collapse; }
-        .file-table thead { background: var(--bg); }
-        .file-table th {
-            padding: 10px 14px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            color: var(--text-secondary);
-            letter-spacing: 0.3px;
-            border-bottom: 1px solid var(--border);
-        }
-        .file-table td {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-        }
-        .file-table tbody tr { transition: var(--transition); }
-        .file-table tbody tr:hover { background: #fafbfc; }
-        .file-table .folder-row { cursor: pointer; }
-        .file-table .folder-row:hover { background: var(--primary-light); }
-        .file-table .file-row[draggable="true"] { cursor: grab; }
-        .file-table .file-row[draggable="true"]:active { cursor: grabbing; }
-        .file-table .file-row.dragging { opacity: 0.4; }
-        .file-table .folder-row.drag-over { background: var(--primary-light); box-shadow: inset 0 0 0 2px var(--primary); }
-        .file-table .file-name {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
-            font-weight: 500;
-            min-width: 0;
-        }
-        .file-table .file-name i { font-size: 18px; width: 22px; text-align: center; color: var(--text-secondary); flex-shrink: 0; }
-        .file-table .file-name .fname-text { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
-        .file-table .file-name .folder-icon { color: #f5b342; }
-        .file-table .file-size { color: var(--text-secondary); font-size: 13px; }
-        .file-table .file-time { color: var(--text-light); font-size: 12px; }
-        .file-table .file-actions { display: flex; gap: 4px; }
-        .file-table .file-actions .btn-sm {
-            width: 28px;
-            height: 28px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            transition: var(--transition);
-            background: transparent;
-            border: none;
-            font-size: 13px;
-        }
-        .file-table .file-actions .btn-sm:hover { background: var(--bg); color: var(--text); }
-        .file-table .file-actions .btn-sm.primary:hover { color: var(--primary); background: var(--primary-light); }
-        .file-table .file-actions .btn-sm.danger:hover { color: #e5484d; background: #fef2f2; }
-        .file-table input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
-        .empty-state i { font-size: 56px; color: var(--border); margin-bottom: 16px; display: block; }
-        .empty-state p { font-size: 15px; color: var(--text-secondary); }
-        
-        /* 分页 */
-        .pagination-wrap { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
-        .pagination-wrap a {
-            padding: 6px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            color: var(--text-secondary);
-            background: var(--card);
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-        .pagination-wrap a:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
-        .pagination-wrap a.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        
-        /* 弹窗 */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 300;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(2px);
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-box {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            width: 440px;
-            max-width: 92vw;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: modalIn 0.2s ease;
-        }
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .modal-box.sm { width: 380px; }
-        .modal-box .m-header {
-            padding: 16px 20px 12px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .modal-box .m-header h6 { font-size: 15px; font-weight: 600; }
-        .modal-box .m-header .close-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: none;
-            background: transparent;
-            font-size: 20px;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        .modal-box .m-header .close-btn:hover { background: var(--bg); color: var(--text); }
-        .modal-box .m-body { padding: 20px; }
-        .modal-box .m-footer {
-            padding: 12px 20px 16px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-        .modal-box .m-footer .btn {
-            padding: 8px 20px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 500;
-            transition: var(--transition);
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text-secondary);
-        }
-        .modal-box .m-footer .btn:hover { background: var(--bg); }
-        .modal-box .m-footer .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .modal-box .m-footer .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
-        .modal-box .m-footer .btn-secondary { background: transparent; border-color: transparent; }
-        .modal-box .m-footer .btn-secondary:hover { background: var(--bg); border-color: var(--border); }
-        .form-control {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            transition: var(--transition);
-            background: var(--card);
-            color: var(--text);
-        }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.1); }
-        .form-select {
-            width: 100%;
-            padding: 8px 28px 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            background: var(--card);
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b98a9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-        }
-        .form-select:focus { border-color: var(--primary); }
-        .form-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; display: block; }
-        .mt-2 { margin-top: 8px; }
-        .me-1 { margin-right: 4px; }
-        
-        /* 上传进度条 */
-        .upload-progress {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 320px;
-            max-width: calc(100vw - 40px);
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            padding: 14px 18px;
-            z-index: 400;
-            display: none;
-            border: 1px solid var(--border);
-        }
-        .upload-progress.show { display: block; }
-        .upload-progress .title { font-weight: 600; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .upload-progress .file-list { max-height: 120px; overflow-y: auto; font-size: 12px; }
-        .upload-progress .file-item { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border); }
-        .upload-progress .file-item .name { color: var(--text-secondary); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .upload-progress .file-item .status { color: var(--text-light); font-size: 11px; }
-        .upload-progress .file-item .status.error { color: #e5484d; }
-        .upload-progress .overall { margin-top: 8px; font-size: 12px; color: var(--text-secondary); text-align: right; }
-        
-        /* 拖拽上传遮罩 */
-        .drag-overlay {
-            display: none;
-            position: absolute;
-            inset: 0;
-            background: rgba(45, 140, 255, 0.06);
-            border: 2px dashed var(--primary);
-            border-radius: var(--radius);
-            z-index: 10;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: var(--primary);
-            pointer-events: none;
-        }
-        .drag-overlay.show { display: flex; }
-        .drag-overlay i { font-size: 40px; margin-bottom: 10px; }
-        .drag-overlay span { font-size: 16px; font-weight: 500; }
-        
-        /* 个人中心弹窗特殊样式 */
-        #profileModal .profile-avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-        
-        /* 列表视图中的缩略图 */
-        .file-table .file-name .file-thumb {
-            width: 26px; height: 26px; border-radius: 6px; object-fit: cover; flex-shrink: 0;
-        }
-        /* 网格视图 */
-        .file-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 14px;
-        }
-        .file-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 14px 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: var(--transition);
-            position: relative;
-        }
-        .file-card:hover {
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-            border-color: var(--primary);
-        }
-        .file-card[draggable="true"] { cursor: grab; }
-        .file-card .fc-thumb {
-            width: 64px; height: 64px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px; color: var(--text-secondary);
-            overflow: hidden; margin-bottom: 10px; background: var(--bg);
-        }
-        .file-card .fc-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .file-card .fc-thumb .folder-icon { color: #f5b342; }
-        .file-card .fc-name {
-            font-size: 13px; font-weight: 500; width: 100%;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .file-card .fc-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; }
-        .file-card .fc-actions {
-            display: flex; gap: 4px; margin-top: 10px;
-            opacity: 0; transition: var(--transition);
-        }
-        .file-card:hover .fc-actions { opacity: 1; }
-        .file-card .fc-actions .btn-sm {
-            width: 30px; height: 30px; border-radius: var(--radius-sm);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-light); background: var(--bg); transition: var(--transition);
-        }
-        .file-card .fc-actions .btn-sm:hover { color: var(--text); }
-        .file-card .fc-actions .btn-sm.primary:hover { color: var(--primary); background: var(--primary-light); }
-        .file-card .fc-actions .btn-sm.danger:hover { color: #e5484d; background: #fef2f2; }
-
-        /* 响应式设计 - 关键修复 */
-        @media (max-width: 768px) {
-            :root { --sidebar-width: 0px; }
-            .sidebar {
-                display: none; /* 在移动设备上隐藏侧边栏 */
-            }
-            .main-content {
-                padding: 12px 14px 30px;
-            }
-            .navbar-custom {
-                padding: 0 14px;
-            }
-            .toolbar {
-                flex-direction: column;
-                align-items: stretch;
-                padding: 12px 14px;
-            }
-            .toolbar .actions {
-                flex-wrap: wrap;
-            }
-            .actions .search-box {
-                width: 100%;
-            }
-            .actions .search-box:focus {
-                width: 100%;
-            }
-            /* 隐藏文件表格中的部分列以适应小屏幕 */
-            .file-table th:nth-child(3),
-            .file-table td:nth-child(3),
-            .file-table th:nth-child(4),
-            .file-table td:nth-child(4) {
-                display: none;
-            }
-            .file-table .file-actions .btn-sm span {
-                display: none;
-            }
-            /* 长文件名自动换行：固定列布局，名称列吃剩余宽度并换行，操作列 4 个按钮始终可见 */
-            .file-table table { table-layout: fixed; }
-            .file-table th:nth-child(1),
-            .file-table td:nth-child(1) { width: 34px; }
-            .file-table th:nth-child(2),
-            .file-table td:nth-child(2) { width: auto; }
-            .file-table th:nth-child(5),
-            .file-table td:nth-child(5) { width: 128px; }
-            .file-table td:nth-child(2) { word-break: break-word; overflow-wrap: anywhere; }
-            .file-table .file-actions { flex-wrap: nowrap; }
-            .file-table .file-actions .btn-sm { flex-shrink: 0; }
-            .modal-box {
-                width: 95vw;
-                max-height: 95vh;
-            }
-            .upload-progress {
-                width: calc(100vw - 20px);
-                right: 10px;
-                bottom: 10px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .navbar-brand span {
-                display: none;
-            }
-            .avatar-btn .username {
-                display: none;
-            }
-            .navbar-right .nav-link span {
-                display: none;
-            }
-            .file-table td {
-                padding: 8px 10px;
-            }
-            .file-table th {
-                padding: 8px 10px;
-            }
-        }
-    </style>
 </head>
 <body>
 
-    <nav class="navbar-custom">
-        <button class="drawer-toggle" data-drawer-toggle><i class="fas fa-bars"></i></button>
-        <a class="navbar-brand" href="/">
-        <i class="fas fa-cloud"></i>
-        <span><?= Helper::e($brand) ?></span>
-    </a>
-    <div class="navbar-right">
-        <button class="icon-btn theme-toggle" title="切换深色 / 浅色" style="margin-right:4px"><i class="fas fa-moon"></i></button>
-        <?php if (Session::isAdmin()): ?>
-            <a class="nav-link" href="/admin"><i class="fas fa-cog"></i><span> 管理</span></a>
-        <?php endif; ?>
-        <a class="nav-link" href="/trash"><i class="fas fa-trash"></i><span> 回收站</span></a>
-        <a class="nav-link" href="/share/my"><i class="fas fa-share-alt"></i><span> 分享</span></a>
-        <div class="user-dropdown">
-            <button class="avatar-btn" onclick="toggleDropdown(event)">
-                <span class="username"><?= Helper::e(Session::getUsername()) ?></span>
-                <span class="avatar"><?= mb_substr(Session::getUsername(), 0, 1) ?></span>
-            </button>
-            <div class="dropdown-menu" id="userDropdown">
-                <a href="/profile"><i class="fas fa-user"></i>个人中心</a>
-                <a href="/starred"><i class="fas fa-star"></i>星标</a>
-                <a href="/offline"><i class="fas fa-cloud-arrow-down"></i>离线下载</a>
-                <div class="divider"></div>
-                <a href="/logout"><i class="fas fa-sign-out-alt"></i>退出登录</a>
+    <nav class="topnav">
+        <div class="topnav-inner">
+            <button class="icon-btn hamburger" onclick="openSide()" aria-label="打开导航菜单" title="菜单"><i class="fas fa-bars"></i></button>
+            <a class="brand" href="/"><span class="logo"><i class="fas fa-cloud"></i></span><span><?= Helper::e($brand) ?></span></a>
+            <form class="nav-search" action="/search" method="GET" role="search">
+                <i class="fas fa-search"></i>
+                <input type="text" name="keyword" placeholder="搜索全部文件..." value="<?= Helper::e($search ?? '') ?>" aria-label="搜索文件">
+            </form>
+            <div class="spacer"></div>
+            <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+            <div class="user-menu">
+                <button class="avatar-btn" onclick="toggleDropdown(event)" aria-label="用户菜单">
+                    <span class="username"><?= Helper::e(Session::getUsername()) ?></span>
+                    <span class="avatar"><?= mb_substr(Session::getUsername(), 0, 1) ?></span>
+                </button>
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="/profile"><i class="fas fa-user"></i>个人中心</a>
+                    <a href="/starred"><i class="fas fa-star"></i>星标</a>
+                    <a href="/offline"><i class="fas fa-cloud-arrow-down"></i>离线下载</a>
+                    <a href="/trash"><i class="fas fa-trash-can"></i>回收站</a>
+                    <a href="/share/my"><i class="fas fa-share-nodes"></i>我的分享</a>
+                    <?php if (Session::isAdmin()): ?><a href="/admin"><i class="fas fa-cog"></i>管理后台</a><?php endif; ?>
+                    <div class="divider"></div>
+                    <a href="/logout"><i class="fas fa-arrow-right-from-bracket"></i>退出登录</a>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
 <div class="app-wrapper">
 
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="menu-label">文件</div>
         <a href="/files?folder=0" class="menu-item active">
             <i class="fas fa-folder-open"></i><span>全部文件</span>
@@ -757,15 +74,26 @@
         <a href="/trash" class="menu-item">
             <i class="fas fa-trash"></i><span>回收站</span>
         </a>
+        <a href="/share/my" class="menu-item">
+            <i class="fas fa-share-alt"></i><span>我的分享</span>
+        </a>
+        <div class="sidebar-divider"></div>
+        <a href="/profile" class="menu-item">
+            <i class="fas fa-user"></i><span>个人中心</span>
+        </a>
+        <a href="/logout" class="menu-item">
+            <i class="fas fa-sign-out-alt"></i><span>退出登录</span>
+        </a>
         <div class="storage-wrap">
             <div class="label">存储空间</div>
             <div class="storage-bar">
                 <?php $percent = $storage_total > 0 ? ($storage_used / $storage_total * 100) : 0; ?>
-                <div class="storage-fill" style="width:<?= $percent ?>%"></div>
+                <span style="width:<?= $percent ?>%"></span>
             </div>
             <div class="storage-text"><?= Helper::formatSize($storage_used) ?> / <?= Helper::formatSize($storage_total) ?></div>
         </div>
     </div>
+    <div id="sideMask"></div>
 
     <div class="main-content" id="mainContent">
         <div class="drag-overlay" id="dragOverlay">
@@ -792,10 +120,7 @@
                 <?php endforeach; ?>
             </div>
             <div class="actions">
-                <form class="d-flex" action="/search" method="GET" style="display:flex;gap:6px;">
-                    <input type="text" class="search-box" name="keyword" placeholder="搜索全部文件..." value="<?= Helper::e($search ?? '') ?>">
-                </form>
-                <select class="sort-select" onchange="location.href='/files?folder=<?= $parent_id ?>&sort='+this.value">
+                <select class="sort-select" onchange="location.href='/files?folder=<?= $parent_id ?>&sort='+this.value" aria-label="排序方式">
                     <option value="type ASC, name ASC" <?= $sort == 'type ASC, name ASC' ? 'selected' : '' ?>>按类型</option>
                     <option value="name ASC" <?= $sort == 'name ASC' ? 'selected' : '' ?>>按名称</option>
                     <option value="size DESC" <?= $sort == 'size DESC' ? 'selected' : '' ?>>按大小</option>
@@ -937,7 +262,7 @@
             <input type="text" class="form-control" id="folderName" placeholder="文件夹名称" autofocus>
         </div>
         <div class="m-footer">
-            <button class="btn btn-secondary" onclick="closeModal('createFolderModal')">取消</button>
+            <button class="btn btn-outline" onclick="closeModal('createFolderModal')">取消</button>
             <button class="btn btn-primary" onclick="createFolder()">创建</button>
         </div>
     </div>
@@ -954,7 +279,7 @@
             <input type="text" class="form-control" id="renameName">
         </div>
         <div class="m-footer">
-            <button class="btn btn-secondary" onclick="closeModal('renameModal')">取消</button>
+            <button class="btn btn-outline" onclick="closeModal('renameModal')">取消</button>
             <button class="btn btn-primary" onclick="renameItem()">确定</button>
         </div>
     </div>
@@ -988,7 +313,7 @@
             </div>
         </div>
         <div class="m-footer">
-            <button class="btn btn-secondary" onclick="closeModal('shareModal')">取消</button>
+            <button class="btn btn-outline" onclick="closeModal('shareModal')">取消</button>
             <button class="btn btn-primary" onclick="createShare()">创建</button>
         </div>
     </div>
@@ -1021,7 +346,7 @@
             </div>
         </div>
         <div class="m-footer">
-            <button class="btn btn-secondary" onclick="closeModal('moveModal')">取消</button>
+            <button class="btn btn-outline" onclick="closeModal('moveModal')">取消</button>
             <button class="btn btn-primary" onclick="moveItems()">移动</button>
         </div>
     </div>
@@ -1035,13 +360,13 @@
         </div>
         <div class="m-body">
             <input type="file" id="chunkFileInput" class="form-control">
-            <div style="display:none;margin-top:12px;height:4px;border-radius:2px;background:var(--border);" id="chunkProgress">
+            <div style="display:none;margin-top:12px;height:4px;border-radius:2px;background:var(--line);" id="chunkProgress">
                 <div style="width:0%;height:100%;background:var(--primary);border-radius:2px;transition:width 0.3s;"></div>
             </div>
             <div id="chunkStatus" class="mt-2" style="font-size:13px;color:var(--text-light);"></div>
         </div>
         <div class="m-footer">
-            <button class="btn btn-secondary" onclick="closeModal('chunkUploadModal')">关闭</button>
+            <button class="btn btn-outline" onclick="closeModal('chunkUploadModal')">关闭</button>
             <button class="btn btn-primary" onclick="startChunkUpload()">上传</button>
         </div>
     </div>
@@ -1086,10 +411,8 @@
                 </div>
             </div>
 
-            <div style="padding-top:16px;border-top:1px solid var(--border);">
-                <button onclick="deleteAccount()" style="width:100%;padding:10px;background:#fff;color:#e5484d;border:1px solid #f5c6c6;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transition:var(--transition);">
-                    注销账号
-                </button>
+            <div style="padding-top:16px;border-top:1px solid var(--line);">
+                <button class="btn btn-danger-outline btn-block" onclick="deleteAccount()"><i class="fas fa-triangle-exclamation"></i>注销账号</button>
             </div>
         </div>
     </div>
@@ -1368,7 +691,7 @@ function toggleDropdown(e) {
 
 document.addEventListener('click', function(e) {
     var menu = document.getElementById('userDropdown');
-    if (menu && !e.target.closest('.user-dropdown')) {
+    if (menu && !e.target.closest('.user-menu')) {
         menu.classList.remove('show');
     }
 });
@@ -1496,23 +819,5 @@ function batchDownload() {
 })();
 </script>
 
-<div class="app-drawer-backdrop" id="appDrawerBackdrop"></div>
-<aside class="app-drawer" id="appDrawer">
-    <div class="drawer-head">
-        <span class="drawer-brand"><i class="fas fa-cloud"></i><?= Helper::e($brand) ?></span>
-        <button class="drawer-close" data-drawer-close>&times;</button>
-    </div>
-    <div class="drawer-body">
-        <a class="drawer-item" href="/files?folder=0"><i class="fas fa-folder-open"></i>全部文件</a>
-        <a class="drawer-item" href="/files?folder=0&sort=created_at DESC"><i class="fas fa-clock"></i>最近上传</a>
-        <a class="drawer-item active" href="/trash"><i class="fas fa-trash"></i>回收站</a>
-        <a class="drawer-item" href="/share/my"><i class="fas fa-share-alt"></i>我的分享</a>
-        <div class="drawer-divider"></div>
-        <a class="drawer-item" href="javascript:void(0)" onclick="document.getElementById('fileInput').click()"><i class="fas fa-upload"></i>上传文件</a>
-        <a class="drawer-item" href="javascript:void(0)" onclick="showCreateFolder()"><i class="fas fa-folder-plus"></i>新建文件夹</a>
-        <a class="drawer-item" href="/logout"><i class="fas fa-sign-out-alt"></i>退出登录</a>
-    </div>
-</aside>
-<script src="/js/drawer.js"></script>
 </body>
 </html>

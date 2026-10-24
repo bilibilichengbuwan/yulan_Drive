@@ -13,6 +13,7 @@
 <body>
 <nav class="topnav">
     <div class="topnav-inner">
+        <button class="icon-btn hamburger" onclick="openSide()" aria-label="打开导航菜单"><i class="fas fa-bars"></i></button>
         <a class="brand" href="/dashboard"><span class="logo"><i class="fas fa-cloud"></i></span><span><?= Helper::e($brand) ?></span></a>
         <div class="nav-links"><a href="/dashboard">我的文件</a><a href="/starred">星标</a><a href="/offline">离线下载</a></div>
         <div class="spacer"></div>
@@ -20,7 +21,20 @@
     </div>
 </nav>
 
-<div class="layout" style="display:block">
+<div class="layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="side-card">
+            <a class="side-link" href="/dashboard"><i class="fas fa-folder"></i>我的文件</a>
+            <a class="side-link" href="/starred"><i class="fas fa-star"></i>星标</a>
+            <a class="side-link" href="/offline"><i class="fas fa-cloud-arrow-down"></i>离线下载</a>
+            <a class="side-link" href="/trash"><i class="fas fa-trash-can"></i>回收站</a>
+            <a class="side-link" href="/share/my"><i class="fas fa-share-nodes"></i>我的分享</a>
+            <div class="side-sep"></div>
+            <a class="side-link" href="/profile"><i class="fas fa-user"></i>个人中心</a>
+        </div>
+    </aside>
+    <div id="sideMask"></div>
+
     <main class="main">
         <div id="toast"></div>
         <h1 class="page-title">搜索</h1>

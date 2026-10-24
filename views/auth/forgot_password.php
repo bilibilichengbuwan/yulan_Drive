@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>重置密码 - <?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/ui.css">
     <script src="/js/theme.js"></script>
 </head>
-<body>
+<body class="auth-body">
     <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
     <div class="auth-card">
         <div class="auth-head">

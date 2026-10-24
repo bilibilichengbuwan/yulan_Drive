@@ -22,8 +22,14 @@ class AdminController extends Controller {
             'file_stats' => $this->fileModel->getStats(),
             'share_stats' => $this->shareModel->getStats()
         ];
-        
-        $this->view('admin/index', ['stats' => $stats]);
+
+        // 仪表盘「最近操作」使用真实日志数据（复用 Log 模型，不新增表结构）
+        $recentLogs = $this->logModel->getLogs(1, 8);
+
+        $this->view('admin/index', [
+            'stats' => $stats,
+            'recentLogs' => $recentLogs['items'] ?? []
+        ]);
     }
     
     

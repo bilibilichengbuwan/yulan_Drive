@@ -98,13 +98,6 @@ function createTask() {
         toast('任务已创建'); setTimeout(function () { location.reload(); }, 800);
     });
 }
-function openSide() {
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('sideMask').classList.add('on');
-}
-document.getElementById('sideMask').addEventListener('click', function () {
-    document.getElementById('sidebar').classList.remove('open'); this.classList.remove('on');
-});
 </script>
 </body>
 </html>

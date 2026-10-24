@@ -115,13 +115,6 @@ function delFile(id) {
     if (!confirm('移到回收站？')) return;
     apiPost('/api/delete', { ids: [id] }, function () { location.reload(); });
 }
-function openSide() {
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('sideMask').classList.add('on');
-}
-document.getElementById('sideMask').addEventListener('click', function () {
-    document.getElementById('sidebar').classList.remove('open'); this.classList.remove('on');
-});
 </script>
 </body>
 </html>

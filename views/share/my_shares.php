@@ -120,13 +120,6 @@ function cancelShare(id) {
     if (!confirm('取消后链接立即失效，确定？')) return;
     apiPost('/api/share/cancel', { id: id }, function () { location.reload(); });
 }
-function openSide() {
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('sideMask').classList.add('on');
-}
-document.getElementById('sideMask').addEventListener('click', function () {
-    document.getElementById('sidebar').classList.remove('open'); this.classList.remove('on');
-});
 </script>
 </body>
 </html>

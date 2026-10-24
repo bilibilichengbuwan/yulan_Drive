@@ -9,27 +9,12 @@
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/theme.js"></script>
-    <style>
-        .layout { padding: 24px 32px; }
-        .sidebar { width: 200px; position: sticky; top: calc(var(--nav-h) + 24px); }
-        @media (max-width: 860px) {
-            .layout { padding: 16px; flex-direction: column; }
-            .sidebar {
-                position: fixed; inset: 0 auto 0 0; top: var(--nav-h);
-                width: 264px; max-width: 82vw; z-index: 220;
-                background: var(--card); border-right: 1px solid var(--line);
-                padding: 14px; overflow-y: auto;
-                transform: translateX(-100%); transition: transform .2s ease;
-            }
-            .sidebar.open { transform: none; box-shadow: 0 8px 32px rgba(0,0,0,.2); }
-        }
-    </style>
 </head>
 <body>
 <nav class="topnav">
-    <div class="topnav-inner" style="max-width:none">
+    <div class="topnav-inner">
         <button class="icon-btn hamburger" onclick="openSide()"><i class="fas fa-bars"></i></button>
-        <a class="brand" href="/admin"><span class="logo" style="background:var(--text)"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
+        <a class="brand" href="/admin"><span class="logo"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
         <div class="nav-links"><a class="keep" href="/">返回前台</a></div>
         <div class="spacer"></div>
         <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>

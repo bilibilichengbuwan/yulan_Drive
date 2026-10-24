@@ -13,29 +13,12 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/theme.js"></script>
-    <style>
-        .layout { padding: 24px 32px; }
-        .sidebar { width: 200px; position: sticky; top: calc(var(--nav-h) + 24px); }
-        @media (max-width: 860px) {
-            .layout { padding: 16px; flex-direction: column; }
-            .sidebar {
-                position: fixed; inset: 0 auto 0 0; top: var(--nav-h);
-                width: 264px; max-width: 82vw; z-index: 220;
-                background: var(--card); border-right: 1px solid var(--line);
-                padding: 14px; overflow-y: auto;
-                transform: translateX(-100%); transition: transform .2s ease;
-            }
-            .sidebar.open { transform: none; box-shadow: 0 8px 32px rgba(0,0,0,.2); }
-        }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px 18px; }
-        .field-hint { font-size: 12px; color: var(--text-3); margin-top: 5px; }
-    </style>
 </head>
 <body>
 <nav class="topnav">
-    <div class="topnav-inner" style="max-width:none">
+    <div class="topnav-inner">
         <button class="icon-btn hamburger" onclick="openSide()"><i class="fas fa-bars"></i></button>
-        <a class="brand" href="/admin"><span class="logo" style="background:var(--text)"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
+        <a class="brand" href="/admin"><span class="logo"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
         <div class="nav-links">
             <a class="keep" href="/">返回前台</a>
         </div>
@@ -69,7 +52,7 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
                         <div>
                             <label class="form-label">品牌名称</label>
                             <input class="form-control" name="brand_name" value="<?= Helper::e($settings['brand_name'] ?? '欲蓝网盘') ?>">
-                            <div class="field-hint">全局显示。</div>
+                            <div class="form-hint">全局显示。</div>
                         </div>
                         <div>
                             <label class="form-label">品牌标语</label>
@@ -78,7 +61,7 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
                         <div>
                             <label class="form-label">回收站保留天数</label>
                             <input class="form-control" name="trash_days" type="number" min="1" max="365" value="<?= (int)($settings['trash_days'] ?? 7) ?>" style="max-width:140px">
-                            <div class="field-hint">到期自动清理，用户也可手动触发。</div>
+                            <div class="form-hint">到期自动清理，用户也可手动触发。</div>
                         </div>
                         <div>
                             <label class="form-label" style="margin-bottom:10px">开放注册</label>
@@ -105,7 +88,7 @@ $driver = ($settings['storage_driver'] ?? 'local') === 's3' ? 's3' : 'local';
                         <button type="button" class="chip <?= $driver === 'local' ? 'on' : '' ?>" onclick="pickDriver('local')">本地磁盘</button>
                         <button type="button" class="chip <?= $driver === 's3' ? 'on' : '' ?>" onclick="pickDriver('s3')">对象存储（S3）</button>
                     </div>
-                    <div class="field-hint">切换后新上传的文件写入新驱动；历史文件仍按记录的路径读取。建议切换前先「测试连接」。</div>
+                    <div class="form-hint">切换后新上传的文件写入新驱动；历史文件仍按记录的路径读取。建议切换前先「测试连接」。</div>
                 </div>
 
                 <div id="s3Fields" class="<?= $driver === 's3' ? '' : 'hidden' ?>">
