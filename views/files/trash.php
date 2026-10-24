@@ -59,6 +59,15 @@ function trashRemain($deletedAt, $trashDays, $now) {
         }
         .banner i { color: #f5a623; margin-top: 2px; }
 
+        .trash-tools { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+        .btn-clean {
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+            font-size: 13px; font-weight: 500; cursor: pointer; transition: .15s;
+            background: #fff; border: 1px solid var(--border); color: var(--muted);
+        }
+        .btn-clean:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .btn-clean i { font-size: 13px; }
+
         .batch-bar {
             display: none; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border);
             border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; box-shadow: var(--shadow);
@@ -140,6 +149,10 @@ function trashRemain($deletedAt, $trashDays, $now) {
     <div class="banner">
         <i class="fas fa-info-circle"></i>
         <div>回收站中的文件最多保留 <b><?= $trashDays ?></b> 天，到期后将自动永久删除，无法恢复。请及时恢复需要保留的文件。</div>
+    </div>
+
+    <div class="trash-tools">
+        <button class="btn-clean" onclick="cleanupTrash()"><i class="fas fa-broom"></i> 立即清理过期文件</button>
     </div>
 
     <div class="batch-bar" id="batch-actions">
@@ -236,6 +249,13 @@ function batchForceDelete() {
     if (!ids.length) { alert('请选择文件'); return; }
     if (!confirm('彻底删除后无法恢复，确定要删除吗？')) return;
     apiRequest('/api/force-delete', { ids: ids }, function () { location.reload(); });
+}
+function cleanupTrash() {
+    if (!confirm('确定要立即清理超过 ' + <?= $trashDays ?> + ' 天的过期文件吗？此操作不可恢复。')) return;
+    apiRequest('/api/trash/cleanup', {}, function (d) {
+        alert(d.message || '清理完成');
+        location.reload();
+    });
 }
 </script>
 </body>

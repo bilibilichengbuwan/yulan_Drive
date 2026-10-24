@@ -5,40 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 - <?= Helper::e($brand) ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
-<body class="bg-light">
-    <div class="container">
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-5">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h3 class="text-center mb-4"><?= Helper::e($brand) ?> 登录</h3>
-                        <div id="alert-box"></div>
-                        <form id="loginForm">
-                            <div class="mb-3">
-                                <label class="form-label">用户名/邮箱</label>
-                                <input type="text" class="form-control" name="email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">密码</label>
-                                <input type="password" class="form-control" name="password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">登录</button>
-                        </form>
-                        <div class="mt-3 text-center">
-                            <?php if ($registerEnabled): ?>
-                                <a href="/register">还没有账号？注册</a> |
-                            <?php endif; ?>
-                            <a href="/forgot-password">忘记密码？</a>
-                        </div>
-                    </div>
+<body>
+    <div class="auth-card">
+        <div class="auth-head">
+            <div class="logo"><i class="fas fa-cloud"></i></div>
+            <h2><?= Helper::e($brand) ?></h2>
+            <p>登录以管理你的私人云盘</p>
+        </div>
+        <div class="auth-body">
+            <div id="alert-box"></div>
+            <form id="loginForm">
+                <div class="field">
+                    <label class="form-label">用户名 / 邮箱</label>
+                    <input type="text" class="form-control" name="email" required autocomplete="username">
                 </div>
+                <div class="field">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-control" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">登 录</button>
+            </form>
+            <div class="auth-foot">
+                <?php if ($registerEnabled): ?>
+                    <a href="/register">还没有账号？立即注册</a><br>
+                <?php endif; ?>
+                <a href="/forgot-password">忘记密码？</a>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/app.js"></script>
     <script>
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -53,7 +50,7 @@
             });
             const json = await res.json();
             if (json.code === 0) {
-                window.location.href = json.data?.redirect || '/dashboard';
+                window.location.href = json.data?.redirect || '/files';
             } else {
                 document.getElementById('alert-box').innerHTML = '<div class="alert alert-danger">' + json.message + '</div>';
             }

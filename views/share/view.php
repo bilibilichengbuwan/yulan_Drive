@@ -167,7 +167,9 @@
     <div class="share-card">
         <div class="card-top">
             <div class="file-icon <?= $file['type'] == 'folder' ? 'folder' : 'file' ?>">
-                <?php if ($file['type'] == 'folder'): ?>
+                <?php if ($file['type'] == 'file' && Helper::isImage($file['name'])): ?>
+                    <img src="/file-content?id=<?= (int)$file['id'] ?>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">
+                <?php elseif ($file['type'] == 'folder'): ?>
                     <i class="fas fa-folder"></i>
                 <?php else: ?>
                     <i class="fas fa-file"></i>
@@ -203,6 +205,10 @@
                         <span class="value"><?= $share['download_count'] ?> / <?= $share['max_downloads'] ?></span>
                     </div>
                 <?php endif; ?>
+                <div class="row">
+                    <span class="label">访问次数</span>
+                    <span class="value"><?= (int)($share['view_count'] ?? 0) ?></span>
+                </div>
             </div>
             
             <div id="alert-box" class="alert-box"></div>

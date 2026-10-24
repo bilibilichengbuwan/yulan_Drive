@@ -54,6 +54,8 @@ require_once __DIR__ . '/core/Session.php';
 require_once __DIR__ . '/core/Mailer.php';
 require_once __DIR__ . '/core/Middleware.php';
 require_once __DIR__ . '/core/RateLimiter.php';
+require_once __DIR__ . '/core/Schema.php';
+require_once __DIR__ . '/core/Thumbnail.php';
 require_once __DIR__ . '/core/Installer.php';
 require_once __DIR__ . '/models/Model.php';
 require_once __DIR__ . '/models/User.php';
@@ -68,6 +70,7 @@ require_once __DIR__ . '/controllers/ShareController.php';
 require_once __DIR__ . '/controllers/AdminController.php';
 
 Installer::check();
+Schema::migrate();
 Session::start();
 
 $lastCleanup = Setting::get('trash_cleanup_last_run', '');
@@ -165,6 +168,10 @@ Router::get('/preview', function() {
 
 Router::get('/file-content', function() {
     (new FileController())->fileContent();
+}, [[Middleware::class, 'auth']]);
+
+Router::get('/file-thumbnail', function() {
+    (new FileController())->thumbnail();
 }, [[Middleware::class, 'auth']]);
 
 Router::get('/download', function() {
@@ -279,6 +286,10 @@ Router::post('/api/restore', function() {
 
 Router::post('/api/force-delete', function() {
     (new FileController())->forceDelete();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/trash/cleanup', function() {
+    (new FileController())->cleanupTrash();
 }, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
 
 Router::get('/api/folder-tree', function() {

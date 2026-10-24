@@ -549,6 +549,61 @@
             flex-shrink: 0;
         }
         
+        /* 列表视图中的缩略图 */
+        .file-table .file-name .file-thumb {
+            width: 26px; height: 26px; border-radius: 6px; object-fit: cover; flex-shrink: 0;
+        }
+        /* 网格视图 */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 14px;
+        }
+        .file-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 14px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        .file-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        .file-card[draggable="true"] { cursor: grab; }
+        .file-card .fc-thumb {
+            width: 64px; height: 64px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; color: var(--text-secondary);
+            overflow: hidden; margin-bottom: 10px; background: var(--bg);
+        }
+        .file-card .fc-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .file-card .fc-thumb .folder-icon { color: #f5b342; }
+        .file-card .fc-name {
+            font-size: 13px; font-weight: 500; width: 100%;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .file-card .fc-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+        .file-card .fc-actions {
+            display: flex; gap: 4px; margin-top: 10px;
+            opacity: 0; transition: var(--transition);
+        }
+        .file-card:hover .fc-actions { opacity: 1; }
+        .file-card .fc-actions .btn-sm {
+            width: 30px; height: 30px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-light); background: var(--bg); transition: var(--transition);
+        }
+        .file-card .fc-actions .btn-sm:hover { color: var(--text); }
+        .file-card .fc-actions .btn-sm.primary:hover { color: var(--primary); background: var(--primary-light); }
+        .file-card .fc-actions .btn-sm.danger:hover { color: #e5484d; background: #fef2f2; }
+
         /* 响应式设计 - 关键修复 */
         @media (max-width: 768px) {
             :root { --sidebar-width: 0px; }
@@ -714,9 +769,8 @@
                 <?php endforeach; ?>
             </div>
             <div class="actions">
-                <form class="d-flex" action="/files" method="GET" style="display:flex;gap:6px;">
-                    <input type="hidden" name="folder" value="<?= (int)$parent_id ?>">
-                    <input type="text" class="search-box" name="search" placeholder="搜索文件...">
+                <form class="d-flex" action="/search" method="GET" style="display:flex;gap:6px;">
+                    <input type="text" class="search-box" name="keyword" placeholder="搜索全部文件..." value="<?= Helper::e($search ?? '') ?>">
                 </form>
                 <select class="sort-select" onchange="location.href='/files?folder=<?= $parent_id ?>&sort='+this.value">
                     <option value="type ASC, name ASC" <?= $sort == 'type ASC, name ASC' ? 'selected' : '' ?>>按类型</option>
@@ -726,6 +780,9 @@
                 </select>
                 <button class="btn" onclick="showCreateFolder()">
                     <i class="fas fa-folder-plus"></i><span> 新建</span>
+                </button>
+                <button class="btn" id="viewToggle" onclick="toggleView()" title="切换视图">
+                    <i class="fas fa-th-large"></i><span> 网格</span>
                 </button>
                 <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
                     <i class="fas fa-upload"></i> 上传
@@ -740,7 +797,7 @@
             <button class="batch-btn" onclick="showBatchMove()"><i class="fas fa-arrows-alt me-1"></i>移动</button>
         </div>
 
-        <div class="file-table">
+        <div class="file-table" id="listView">
             <table>
                 <thead>
                     <tr>
@@ -769,7 +826,14 @@
                                     <?php if ($file['type'] == 'folder'): ?>
                                         <a href="/files?folder=<?= $file['id'] ?>" class="file-name"><i class="fas fa-folder folder-icon"></i><span class="fname-text"><?= Helper::e($file['name']) ?></span></a>
                                     <?php else: ?>
-                                        <a href="/preview?id=<?= $file['id'] ?>" class="file-name"><?= Helper::getFileIcon($file['name']) ?> <span class="fname-text"><?= Helper::e($file['name']) ?></span></a>
+                                        <a href="/preview?id=<?= $file['id'] ?>" class="file-name">
+                                            <?php if (!empty($file['thumbnail'])): ?>
+                                                <img src="/file-thumbnail?id=<?= $file['id'] ?>" class="file-thumb" alt="" loading="lazy">
+                                            <?php else: ?>
+                                                <?= Helper::getFileIcon($file['name']) ?>
+                                            <?php endif; ?>
+                                            <span class="fname-text"><?= Helper::e($file['name']) ?></span>
+                                        </a>
                                     <?php endif; ?>
                                 </td>
                                 <td class="file-size"><?= $file['type'] == 'file' ? Helper::formatSize($file['size']) : '-' ?></td>
@@ -789,6 +853,34 @@
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+
+        <div class="file-grid" id="gridView" style="display:none">
+            <?php if (empty($files)): ?>
+                <div class="empty-state"><i class="fas fa-folder-open"></i><p>这里空空的，上传点文件吧</p></div>
+            <?php else: ?>
+                <?php foreach ($files as $file): ?>
+                    <div class="file-card" data-id="<?= $file['id'] ?>" data-type="<?= $file['type'] ?>" <?= $file['type'] == 'file' ? 'draggable="true"' : '' ?>>
+                        <div class="fc-thumb">
+                            <?php if ($file['type'] == 'folder'): ?>
+                                <i class="fas fa-folder folder-icon"></i>
+                            <?php elseif (!empty($file['thumbnail'])): ?>
+                                <img src="/file-thumbnail?id=<?= $file['id'] ?>" alt="" loading="lazy">
+                            <?php else: ?>
+                                <?= Helper::getFileIcon($file['name']) ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="fc-name" title="<?= Helper::e($file['name']) ?>"><?= Helper::e($file['name']) ?></div>
+                        <div class="fc-meta"><?= $file['type'] == 'file' ? Helper::formatSize($file['size']) : '文件夹' ?></div>
+                        <div class="fc-actions">
+                            <?php if ($file['type'] == 'file'): ?><button class="btn-sm" onclick="downloadFile(<?= $file['id'] ?>)" title="下载"><i class="fas fa-download"></i></button><?php endif; ?>
+                            <button class="btn-sm primary" onclick="showShare(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="分享"><i class="fas fa-share"></i></button>
+                            <button class="btn-sm" onclick="showRename(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="重命名"><i class="fas fa-pen"></i></button>
+                            <button class="btn-sm danger" onclick="deleteItem(<?= $file['id'] ?>)" title="删除"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <?php if ($pagination['total_pages'] > 1): ?>
@@ -1177,11 +1269,12 @@ function startChunkUpload() {
         var chunk = file.slice(start, end);
 
         var formData = new FormData();
-        formData.append('file', chunk);
-        formData.append('chunk', currentChunk);
-        formData.append('total', totalChunks);
-        formData.append('upload_id', uploadId);
-        formData.append('name', file.name);
+        formData.append('chunk', chunk);
+        formData.append('chunk_index', currentChunk);
+        formData.append('total_chunks', totalChunks);
+        formData.append('file_md5', uploadId);
+        formData.append('file_name', file.name);
+        formData.append('file_size', file.size);
         formData.append('parent_id', currentFolder);
 
         // 获取 CSRF Token
@@ -1218,6 +1311,22 @@ function startChunkUpload() {
 // ==========================================
 // 其他 UI 和业务逻辑函数
 // ==========================================
+function toggleView() {
+    var list = document.getElementById('listView');
+    var grid = document.getElementById('gridView');
+    var btn = document.getElementById('viewToggle');
+    var gridOn = grid.style.display !== 'none';
+    if (gridOn) {
+        grid.style.display = 'none';
+        list.style.display = '';
+        btn.innerHTML = '<i class="fas fa-th-large"></i><span> 网格</span>';
+    } else {
+        list.style.display = 'none';
+        grid.style.display = '';
+        btn.innerHTML = '<i class="fas fa-list"></i><span> 列表</span>';
+    }
+}
+
 function toggleDropdown(e) {
     e.stopPropagation();
     var menu = document.getElementById('userDropdown');

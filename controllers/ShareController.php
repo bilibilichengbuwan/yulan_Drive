@@ -73,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
                 $file = $this->fileModel->find($share['file_id']);
+                $this->recordView($share['share_code']);
                 $this->view('share/view', [
                     'share' => $share,
                     'file' => $file
@@ -105,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $share = $result['share'];
         $file = $this->fileModel->find($share['file_id']);
+        $this->recordView($share['share_code']);
         
         $this->view('share/view', [
             'share' => $share,
@@ -188,6 +190,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     
+    private function recordView($code) {
+        $db = Database::getInstance();
+        $db->execute("UPDATE shares SET view_count = view_count + 1 WHERE share_code = ?", [$code]);
+    }
+
     public function saveToDisk() {
         $fileId = (int)$this->post('file_id');
         $shareCode = trim((string)$this->post('share_code'));

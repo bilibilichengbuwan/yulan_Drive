@@ -214,7 +214,14 @@ class FileController extends Controller {
             ],
             $filePath
         );
-        
+
+        if (!empty($result['id'])) {
+            $thumb = $this->makeThumbnail($filePath, $file['name'], $md5, $userId);
+            if ($thumb) {
+                $this->fileModel->update($result['id'], ['thumbnail' => $thumb]);
+            }
+        }
+
         return ['success' => true, 'id' => $result['id']];
     }
     
@@ -351,6 +358,13 @@ class FileController extends Controller {
         $result = $this->fileModel->createFile($userId, $parentId, ['name' => $fileName, 'size' => $realSize, 'md5' => $realMd5, 'mime_type' => Helper::getMimeType($fileName)], $filePath);
         if (!empty($result['instant']) && $result['instant']) @unlink($filePath);
 
+        if (!empty($result['id'])) {
+            $thumb = $this->makeThumbnail($filePath, $fileName, $realMd5, $userId);
+            if ($thumb) {
+                $this->fileModel->update($result['id'], ['thumbnail' => $thumb]);
+            }
+        }
+
         $log = new Log();
         $log->addLog('upload', 'file', $result['id'], "上传文件: {$fileName}");
         return ['code' => 0, 'message' => '文件上传成功', 'data' => ['id' => $result['id']]];
@@ -478,6 +492,50 @@ class FileController extends Controller {
         header('Content-Length: ' . filesize($file['path']));
         readfile($file['path']);
         exit;
+    }
+
+    public function thumbnail() {
+        while (ob_get_level()) ob_end_clean();
+        $fileId = (int)$this->get('id', 0);
+        $file = $this->fileModel->find($fileId);
+        if (!$file || (int)$file['user_id'] !== (int)Session::getUserId() || (int)$file['is_deleted'] === 1 || $file['type'] !== 'file') {
+            $this->error('文件不存在或无权访问', 404);
+        }
+
+        $thumb = $file['thumbnail'] ?? '';
+        if (!empty($thumb) && is_file($thumb) && is_readable($thumb)) {
+            header('Content-Type: ' . Helper::getMimeType($thumb));
+            header('Cache-Control: public, max-age=86400');
+            header('X-Content-Type-Options: nosniff');
+            readfile($thumb);
+            exit;
+        }
+
+        // 无缩略图（非图片或尚未生成）：图片类型回退原图内联，其余返回 404
+        if (!empty($file['path']) && is_file($file['path']) && is_readable($file['path'])) {
+            $mime = Helper::getMimeType($file['name']);
+            if (Thumbnail::isSupportedImage($mime)) {
+                header('Content-Type: ' . $mime);
+                header('Cache-Control: public, max-age=86400');
+                readfile($file['path']);
+                exit;
+            }
+        }
+        $this->error('该文件类型不支持缩略图', 415);
+    }
+
+    private function makeThumbnail($filePath, $name, $md5, $userId) {
+        $mime = Helper::getMimeType($name);
+        if (!Thumbnail::isSupportedImage($mime)) {
+            return null;
+        }
+        $config = require __DIR__ . '/../config/app.php';
+        $thumbDir = rtrim($config['upload_storage_dir'], '/\\') . '/thumbs/' . $userId . '/' . date('Y/m/d');
+        if (!is_dir($thumbDir)) {
+            @mkdir($thumbDir, 0755, true);
+        }
+        $thumbPath = $thumbDir . '/' . ($md5 ?: bin2hex(random_bytes(8))) . '.jpg';
+        return Thumbnail::generate($filePath, $thumbPath) ? $thumbPath : null;
     }
 
     public function delete() {
@@ -628,37 +686,105 @@ class FileController extends Controller {
     
     
     public function search() {
-        $keyword = $this->get('keyword');
+        $keyword = trim($this->get('keyword', ''));
+        $type = $this->get('type', 'all');      // all|image|doc|video|audio|archive|folder|other
+        $time = $this->get('time', 'all');      // all|today|week|month
         $page = max(1, (int)$this->get('page', 1));
-        
-        if (empty($keyword)) {
-            $this->error('请输入搜索关键词');
-        }
-        
+
         $userId = Session::getUserId();
         $db = Database::getInstance();
-        
-        $where = "user_id = ? AND is_deleted = 0 AND name LIKE ?";
-        $params = [$userId, "%{$keyword}%"];
-        
+
+        $where = "user_id = ? AND is_deleted = 0";
+        $params = [$userId];
+
+        if ($keyword !== '') {
+            $where .= " AND name LIKE ?";
+            $params[] = "%{$keyword}%";
+        }
+
+        // 类型过滤（按扩展名分组，仅对文件生效）
+        $extGroups = [
+            'image'   => ['jpg','jpeg','png','gif','webp','bmp','svg','ico','heic','tiff'],
+            'doc'     => ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','md','csv','rtf','odt','ods','odp','pages','key','epub'],
+            'video'   => ['mp4','webm','mov','avi','mkv','flv','wmv','m4v','mpeg','mpg','mts'],
+            'audio'   => ['mp3','wav','ogg','flac','aac','m4a','wma','ape'],
+            'archive' => ['zip','rar','7z','tar','gz','bz2','xz','tgz','zst'],
+        ];
+        if ($type === 'folder') {
+            $where .= " AND type = 'folder'";
+        } elseif (isset($extGroups[$type])) {
+            $exts = $extGroups[$type];
+            $ph = implode(',', array_fill(0, count($exts), '?'));
+            $where .= " AND type = 'file' AND LOWER(SUBSTRING_INDEX(name, '.', -1)) IN ({$ph})";
+            foreach ($exts as $e) { $params[] = $e; }
+        } elseif ($type === 'other') {
+            $all = array_merge(...array_values($extGroups));
+            $ph = implode(',', array_fill(0, count($all), '?'));
+            $where .= " AND type = 'file' AND LOWER(SUBSTRING_INDEX(name, '.', -1)) NOT IN ({$ph})";
+            foreach ($all as $e) { $params[] = $e; }
+        }
+
+        // 时间过滤
+        if ($time === 'today') {
+            $where .= " AND created_at >= CURDATE()";
+        } elseif ($time === 'week') {
+            $where .= " AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+        } elseif ($time === 'month') {
+            $where .= " AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+        }
+
         $countSql = "SELECT COUNT(*) as count FROM files WHERE {$where}";
         $total = $db->fetchOne($countSql, $params)['count'];
-        
-        $perPage = 20;
+
+        $perPage = 24;
         $offset = ($page - 1) * $perPage;
         $sql = "SELECT * FROM files WHERE {$where} ORDER BY created_at DESC LIMIT {$perPage} OFFSET {$offset}";
         $items = $db->fetchAll($sql, $params);
-        
+
         $this->view('files/search', [
             'files' => $items,
             'keyword' => $keyword,
+            'type' => $type,
+            'time' => $time,
             'pagination' => [
                 'total' => $total,
                 'page' => $page,
                 'per_page' => $perPage,
-                'total_pages' => ceil($total / $perPage)
+                'total_pages' => max(1, ceil($total / $perPage))
             ]
         ]);
+    }
+
+
+    /**
+     * 手动触发回收站清理：删除当前用户超过保留期（trash_days）的回收站文件。
+     * 每日自动清理在 index.php 引导区执行；此接口供用户在回收站页面手动立即清理。
+     */
+    public function cleanupTrash() {
+        $userId = Session::getUserId();
+        $trashDays = max(1, (int)Setting::get('trash_days', '7'));
+        $cutoff = date('Y-m-d H:i:s', strtotime("-{$trashDays} days"));
+        $db = Database::getInstance();
+
+        $expired = $db->fetchAll(
+            "SELECT id, type, path, user_id, size, md5 FROM files WHERE user_id = ? AND is_deleted = 1 AND deleted_at IS NOT NULL AND deleted_at < ?",
+            [$userId, $cutoff]
+        );
+
+        $count = 0;
+        if (!empty($expired)) {
+            $fileModel = new File();
+            foreach ($expired as $f) {
+                $fileModel->permanentDeleteNode($f);
+            }
+            $ids = array_column($expired, 'id');
+            $ph = implode(',', array_fill(0, count($ids), '?'));
+            $db->execute("DELETE FROM shares WHERE file_id IN ({$ph})", $ids);
+            $db->execute("DELETE FROM download_tokens WHERE file_id IN ({$ph})", $ids);
+            $count = count($expired);
+        }
+
+        $this->success('已清理 ' . $count . ' 个过期文件', ['count' => $count]);
     }
     
     

@@ -5,44 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>重置密码 - <?= Helper::e($brand) ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
-<body class="bg-light">
-    <div class="container">
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-5">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h3 class="text-center mb-4">重置密码</h3>
-                        <div id="alert-box"></div>
-                        <form id="resetForm">
-                            <div class="mb-3">
-                                <label class="form-label">邮箱</label>
-                                <input type="email" class="form-control" name="email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">验证码</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="verify_code" required maxlength="6">
-                                    <button type="button" class="btn btn-outline-secondary" id="sendCodeBtn">发送验证码</button>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">新密码</label>
-                                <input type="password" class="form-control" name="password" required minlength="6">
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">重置密码</button>
-                        </form>
-                        <div class="mt-3 text-center">
-                            <a href="/login">返回登录</a>
-                        </div>
+<body>
+    <div class="auth-card">
+        <div class="auth-head">
+            <div class="logo"><i class="fas fa-key"></i></div>
+            <h2>重置密码</h2>
+            <p>通过邮箱验证码找回你的账号</p>
+        </div>
+        <div class="auth-body">
+            <div id="alert-box"></div>
+            <form id="resetForm">
+                <div class="field">
+                    <label class="form-label">邮箱</label>
+                    <input type="email" class="form-control" name="email" required autocomplete="email">
+                </div>
+                <div class="field">
+                    <label class="form-label">验证码</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="verify_code" required maxlength="6" placeholder="邮箱验证码">
+                        <button type="button" class="btn btn-outline-secondary" id="sendCodeBtn">发送验证码</button>
                     </div>
                 </div>
+                <div class="field">
+                    <label class="form-label">新密码</label>
+                    <input type="password" class="form-control" name="password" required minlength="6" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">重置密码</button>
+            </form>
+            <div class="auth-foot">
+                <a href="/login">返回登录</a>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/app.js"></script>
     <script>
     let countdown = 0;
@@ -54,9 +51,9 @@
         try {
             const res = await fetch('/api/send-code', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest' 
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({ email: email, type: 'reset_password' })
             });

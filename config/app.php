@@ -1,7 +1,7 @@
 <?php
 return [
     'name' => '欲蓝网盘',
-    'version' => '1.0.2',
+    'version' => '1.0.3',
     'debug' => false,
     
     'base_url' => 'http://localhost',
