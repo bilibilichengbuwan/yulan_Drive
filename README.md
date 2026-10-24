@@ -10,7 +10,7 @@
 - 分享密码保护、转存到我的网盘、直接下载文件 / Share password protection, save to my cloud disk, direct file download
 
 ## 环境要求 / Environment Requirements
-- PHP 7.4
+- PHP 8.x
 - MySQL 5.7+
 
 Nginx 伪静态配置 / Nginx pseudo-static configuration:
