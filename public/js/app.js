@@ -306,3 +306,22 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+function toggleStar(id, btn) {
+    apiPost('/api/file-star', { id: id }, function (json) {
+        var on = json.data && json.data.starred;
+        if (btn) {
+            btn.classList.toggle('on', !!on);
+            var icon = btn.querySelector('i');
+            if (icon) icon.className = on ? 'fas fa-star' : 'far fa-star';
+        }
+    });
+}
+
+function editTags(id, tags) {
+    var val = prompt('标签（用空格或逗号分隔，最多 8 个）', tags || '');
+    if (val === null) return;
+    apiPost('/api/file-tags', { id: id, tags: val }, function (json) {
+        location.reload();
+    });
+}

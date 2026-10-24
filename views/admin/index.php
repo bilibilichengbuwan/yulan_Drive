@@ -4,288 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
     <title>管理后台 - <?= Helper::e($brand) ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/app-admin.css">
+    <script src="/js/theme.js"></script>
     <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: #f6f8fa;
-            color: #1f2a3a;
-            margin: 0;
-            font-size: 14px;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-        a { color: inherit; text-decoration: none; }
-        .navbar-custom {
-            background: #ffffff;
-            padding: 0 32px;
-            height: 56px;
-            border-bottom: 1px solid #eef2f6;
-        }
-        .navbar-custom .navbar-brand {
-            font-size: 16px;
-            font-weight: 500;
-            color: #1f2a3a;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .navbar-custom .navbar-brand i {
-            color: #2d8cff;
-            font-size: 20px;
-        }
-        .navbar-custom .nav-link {
-            color: #5b6778;
-            font-size: 13px;
-            padding: 0 12px;
-            height: 56px;
-            line-height: 56px;
-            border-bottom: 2px solid transparent;
-            transition: all 0.15s;
-        }
-        .navbar-custom .nav-link:hover {
-            color: #1f2a3a;
-            border-bottom-color: #2d8cff;
-        }
-        .navbar-custom .nav-link i {
-            margin-right: 6px;
-            font-size: 14px;
-            color: #8b98a9;
-        }
-        .navbar-custom .nav-link:hover i {
-            color: #2d8cff;
-        }
-        .sidebar {
-            background: #ffffff;
-            border-right: 1px solid #eef2f6;
-            min-height: calc(100vh - 56px);
-            padding: 20px 16px;
-            width: 200px;
-            flex-shrink: 0;
-        }
-        .sidebar .menu-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #8b98a9;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            padding: 0 12px;
-            margin: 16px 0 6px;
-        }
-        .sidebar .menu-label:first-of-type { margin-top: 0; }
-        .sidebar .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            color: #3d4a5c;
-            font-size: 13px;
-            transition: all 0.15s;
-            cursor: pointer;
-        }
-        .sidebar .menu-item:hover { background: #f0f4f9; color: #1f2a3a; }
-        .sidebar .menu-item.active { background: #eef4ff; color: #2d8cff; }
-        .sidebar .menu-item i { width: 18px; font-size: 14px; color: #8b98a9; }
-        .sidebar .menu-item.active i { color: #2d8cff; }
-        .sidebar .menu-item:hover i { color: #1f2a3a; }
-        .sidebar .btn-action {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 6px 12px;
-            border: none;
-            background: transparent;
-            border-radius: 6px;
-            color: #3d4a5c;
-            font-size: 13px;
-            transition: all 0.15s;
-            cursor: pointer;
-        }
-        .sidebar .btn-action:hover { background: #f0f4f9; }
-        .sidebar .btn-action i { width: 18px; font-size: 14px; color: #8b98a9; }
-        .sidebar-divider { height: 1px; background: #eef2f6; margin: 12px; }
-        .main-content { padding: 24px 32px; flex: 1; min-width: 0; background: #f6f8fa; }
-        .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px 16px; margin-bottom: 20px; }
-        .toolbar .breadcrumb { background: transparent; padding: 0; margin: 0; font-size: 13px; }
-        .toolbar .breadcrumb a { color: #5b6778; }
-        .toolbar .breadcrumb a:hover { color: #2d8cff; }
-        .toolbar .breadcrumb .active { color: #1f2a3a; font-weight: 500; }
-        .stat-card {
-            background: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #eef2f6;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        .stat-card .stat-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #8b98a9;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 8px;
-        }
-        .stat-card .stat-value {
-            font-size: 28px;
-            font-weight: 600;
-            color: #1f2a3a;
-            line-height: 1;
-        }
-        .stat-card .stat-sub {
-            font-size: 12px;
-            color: #8b98a9;
-            margin-top: 6px;
-        }
-        .stat-card.primary .stat-value { color: #2d8cff; }
-        .stat-card.success .stat-value { color: #10b981; }
-        .stat-card.info .stat-value { color: #0ea5e9; }
-        .stat-card.warning .stat-value { color: #f59e0b; }
-        .stat-card.danger .stat-value { color: #e5484d; }
-        .content-card {
-            background: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #eef2f6;
-            overflow: hidden;
-        }
-        .content-card .card-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid #eef2f6;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1f2a3a;
-        }
-        .content-card .card-body { padding: 20px; }
+        .layout { padding: 24px 32px; }
+        .sidebar { width: 200px; position: sticky; top: calc(var(--nav-h) + 24px); }
         @media (max-width: 992px) {
-            .sidebar { width: 56px; padding: 12px 8px; }
-            .sidebar .menu-label, .sidebar .menu-item span, .sidebar .btn-action span, .sidebar-divider { display: none; }
-            .sidebar .menu-item, .sidebar .btn-action { justify-content: center; padding: 8px; }
-            .sidebar .menu-item i, .sidebar .btn-action i { width: auto; font-size: 16px; margin: 0; }
-            .main-content { padding: 16px 20px; }
+            .layout { padding: 16px; flex-direction: column; }
+            .sidebar { width: 100%; position: static; }
         }
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-content { padding: 12px 16px; }
-            .stat-card .stat-value { font-size: 22px; }
-            .navbar-custom { padding: 0 16px; }
-        }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+        .stat { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 18px 20px; }
+        .stat .label { font-size: 12.5px; color: var(--text-3); }
+        .stat .value { font-size: 26px; font-weight: 600; margin-top: 6px; }
+        .stat .sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
     </style>
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminNav"><i class="fas fa-bars"></i></button>
-        <a class="navbar-brand" href="/admin">
-            <i class="fas fa-cog"></i>
-            管理后台
-        </a>
-        <div class="d-flex align-items-center gap-3">
-            <a class="nav-link" href="/"><i class="fas fa-home"></i> 返回前台</a>
-        </div>
+<nav class="topnav">
+    <div class="topnav-inner" style="max-width:none">
+        <a class="brand" href="/admin"><span class="logo" style="background:var(--text)"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
+        <div class="nav-links"><a href="/">返回前台</a></div>
+        <div class="spacer"></div>
+        <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
     </div>
-    </nav>
+</nav>
 
-    <?php $activeMenu = 'dashboard'; include __DIR__ . '/../partials/admin_offcanvas.php'; ?>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="side-card">
+            <a class="side-link active" href="/admin"><i class="fas fa-tachometer-alt"></i>仪表盘</a>
+            <a class="side-link" href="/admin/users"><i class="fas fa-users"></i>用户管理</a>
+            <a class="side-link" href="/admin/files"><i class="fas fa-folder-open"></i>所有文件</a>
+            <a class="side-link" href="/admin/logs"><i class="fas fa-history"></i>操作日志</a>
+            <div class="side-sep"></div>
+            <a class="side-link" href="/admin/settings"><i class="fas fa-cogs"></i>系统设置</a>
+        </div>
+    </aside>
 
-    <div class="d-flex">
-    <div class="sidebar">
-        <div class="menu-label">导航</div>
-        <a href="/admin" class="menu-item active">
-            <i class="fas fa-tachometer-alt"></i><span>仪表盘</span>
-        </a>
-        <a href="/admin/users" class="menu-item">
-            <i class="fas fa-users"></i><span>用户管理</span>
-        </a>
-        <a href="/admin/files" class="menu-item">
-            <i class="fas fa-folder-open"></i><span>所有文件</span>
-        </a>
-        <a href="/admin/logs" class="menu-item">
-            <i class="fas fa-history"></i><span>操作日志</span>
-        </a>
-        <div class="menu-label">系统</div>
-        <a href="/admin/settings" class="menu-item">
-            <i class="fas fa-cogs"></i><span>系统设置</span>
-        </a>
-    </div>
+    <main class="main">
+        <h1 class="page-title">仪表盘</h1>
 
-    <div class="main-content">
-        <div class="toolbar">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/admin">管理后台</a></li>
-                    <li class="breadcrumb-item active">仪表盘</li>
-                </ol>
-            </nav>
+        <div class="stat-grid mb16">
+            <div class="stat"><div class="label">注册用户</div><div class="value"><?= (int)$stats['user_count'] ?></div></div>
+            <div class="stat"><div class="label">文件总数</div><div class="value"><?= (int)$stats['file_stats']['total_files'] ?></div></div>
+            <div class="stat"><div class="label">文件夹数</div><div class="value"><?= (int)$stats['file_stats']['total_folders'] ?></div></div>
+            <div class="stat"><div class="label">总存储使用</div><div class="value"><?= Helper::formatSize((int)$stats['total_storage']) ?></div></div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-lg-3">
-                <div class="stat-card primary">
-                    <div class="stat-label">注册用户</div>
-                    <div class="stat-value"><?= $stats['user_count'] ?></div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card success">
-                    <div class="stat-label">文件总数</div>
-                    <div class="stat-value"><?= $stats['file_stats']['total_files'] ?></div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card info">
-                    <div class="stat-label">文件夹数</div>
-                    <div class="stat-value"><?= $stats['file_stats']['total_folders'] ?></div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card warning">
-                    <div class="stat-label">总存储使用</div>
-                    <div class="stat-value"><?= Helper::formatSize($stats['total_storage']) ?></div>
-                </div>
-            </div>
+        <div class="stat-grid mb16">
+            <div class="stat"><div class="label">分享链接</div><div class="value"><?= (int)$stats['share_stats']['active_shares'] ?></div><div class="sub">活跃中 / <?= (int)$stats['share_stats']['total_shares'] ?> 总计</div></div>
+            <div class="stat"><div class="label">总下载次数</div><div class="value"><?= (int)$stats['share_stats']['total_downloads'] ?></div><div class="sub">所有分享</div></div>
+            <div class="stat"><div class="label">回收站</div><div class="value"><?= (int)$stats['file_stats']['trash_count'] ?></div><div class="sub">待清理文件</div></div>
         </div>
 
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="content-card">
-                    <div class="card-body text-center" style="padding:32px">
-                        <div class="stat-label">分享链接</div>
-                        <div style="font-size:32px;font-weight:600;color:#2d8cff;margin:8px 0"><?= $stats['share_stats']['active_shares'] ?></div>
-                        <div class="stat-sub">活跃中 / <?= $stats['share_stats']['total_shares'] ?> 总计</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="content-card">
-                    <div class="card-body text-center" style="padding:32px">
-                        <div class="stat-label">总下载次数</div>
-                        <div style="font-size:32px;font-weight:600;color:#10b981;margin:8px 0"><?= $stats['share_stats']['total_downloads'] ?></div>
-                        <div class="stat-sub">所有分享</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="content-card">
-                    <div class="card-body text-center" style="padding:32px">
-                        <div class="stat-label">回收站</div>
-                        <div style="font-size:32px;font-weight:600;color:#e5484d;margin:8px 0"><?= $stats['file_stats']['trash_count'] ?></div>
-                        <div class="stat-sub">待清理文件</div>
-                    </div>
-                </div>
+        <div class="card">
+            <div class="card-head"><h2>存储驱动</h2></div>
+            <div class="card-body" style="font-size:13.5px;color:var(--text-2)">
+                当前使用 <b><?= Setting::get('storage_driver', 'local') === 's3' ? '对象存储（S3 兼容）' : '本地磁盘' ?></b>。
+                可在「系统设置 → 对象存储」中切换或配置。
             </div>
         </div>
-    </div>
+    </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>

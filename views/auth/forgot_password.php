@@ -7,17 +7,21 @@
     <title>重置密码 - <?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/auth.css">
+    <script src="/js/theme.js"></script>
 </head>
 <body>
+    <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
     <div class="auth-card">
         <div class="auth-head">
-            <div class="logo"><i class="fas fa-key"></i></div>
+            <div class="brand-row">
+                <span class="logo"><i class="fas fa-cloud"></i></span>
+                <span class="bname"><?= Helper::e($brand) ?></span>
+            </div>
             <h2>重置密码</h2>
-            <p>通过邮箱验证码找回你的账号</p>
+            <p>通过邮箱验证码找回账号</p>
         </div>
-        <div class="auth-body">
-            <div id="alert-box"></div>
-            <form id="resetForm">
+        <div id="alert-box"></div>
+        <form id="resetForm">
                 <div class="field">
                     <label class="form-label">邮箱</label>
                     <input type="email" class="form-control" name="email" required autocomplete="email">
@@ -38,7 +42,6 @@
             <div class="auth-foot">
                 <a href="/login">返回登录</a>
             </div>
-        </div>
     </div>
     <script src="/js/app.js"></script>
     <script>

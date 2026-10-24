@@ -1,298 +1,180 @@
-<?php $brand = Setting::getBrandName(); ?>
+<?php $brand = Setting::getBrandName(); $isFolder = ($file['type'] ?? 'file') === 'folder'; ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= Helper::e($file['name']) ?> - <?= Helper::e($brand) ?></title>
+    <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
+    <title><?= Helper::e($file['name'] ?? '分享') ?> - <?= Helper::e($brand) ?></title>
+    <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: #f6f8fa;
-            color: #1f2a3a;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            -webkit-font-smoothing: antialiased;
-        }
-        .header {
-            background: #ffffff;
-            border-bottom: 1px solid #eef2f6;
-            padding: 0 32px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .header .brand {
-            font-size: 16px;
-            font-weight: 500;
-            color: #1f2a3a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-        .header .brand i { color: #2d8cff; font-size: 20px; }
-        .container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 32px 16px;
-        }
-        .share-card {
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #eef2f6;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            width: 100%;
-            max-width: 480px;
-            overflow: hidden;
-        }
-        .card-top {
-            padding: 40px 32px 32px;
-            text-align: center;
-        }
-        .file-icon {
-            width: 72px;
-            height: 72px;
-            border-radius: 16px;
-            background: #f0f4f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 32px;
-        }
-        .file-icon.folder { background: #fff8ed; }
-        .file-icon.folder i { color: #f5a623; }
-        .file-icon.file { background: #eef4ff; }
-        .file-icon.file i { color: #2d8cff; }
-        .file-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2a3a;
-            margin-bottom: 8px;
-            word-break: break-all;
-        }
-        .file-meta {
-            font-size: 13px;
-            color: #8b98a9;
-            margin-bottom: 20px;
-        }
-        .share-info {
-            background: #fafbfc;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 24px;
-        }
-        .share-info .row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            padding: 4px 0;
-        }
-        .share-info .label { color: #8b98a9; }
-        .share-info .value { color: #5b6778; font-weight: 500; }
-        .share-info .value.warn { color: #e5484d; }
-        .share-info .value.ok { color: #10b981; }
-        .card-actions {
-            padding: 0 32px 32px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-decoration: none;
-        }
-        .btn-primary {
-            background: #2d8cff;
-            color: #ffffff;
-        }
-        .btn-primary:hover { background: #1a7ae6; }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #e2e8ef;
-            color: #5b6778;
-        }
-        .btn-outline:hover { background: #f0f4f9; border-color: #d0d8e4; }
-        .footer {
-            text-align: center;
-            padding: 16px;
-            font-size: 12px;
-            color: #b0bac9;
-        }
-        .alert-box {
-            display: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-bottom: 16px;
-        }
-        .alert-box.success { background: #ecfdf5; color: #10b981; display: block; }
-        .alert-box.error { background: #fef2f2; color: #e5484d; display: block; }
-        @media (max-width: 480px) {
-            .card-top { padding: 32px 20px 24px; }
-            .card-actions { padding: 0 20px 24px; }
-        }
-    </style>
+    <script src="/js/theme.js"></script>
 </head>
 <body>
+<nav class="topnav">
+    <div class="topnav-inner">
+        <a class="brand" href="/"><span class="logo"><i class="fas fa-cloud"></i></span><span><?= Helper::e($brand) ?></span></a>
+        <div class="spacer"></div>
+        <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+        <a class="btn btn-outline" href="/login">登录</a>
+    </div>
+</nav>
 
-<div class="header">
-    <a href="/" class="brand"><i class="fas fa-cloud"></i> <?= Helper::e($brand) ?></a>
-    <?php if (Session::isLoggedIn()): ?>
-        <a href="/files" style="font-size:13px;color:#5b6778;text-decoration:none">进入网盘 <i class="fas fa-arrow-right" style="font-size:11px"></i></a>
-    <?php else: ?>
-        <a href="/login" style="font-size:13px;color:#5b6778;text-decoration:none">登录</a>
-    <?php endif; ?>
-</div>
+<div class="layout" style="display:block;max-width:860px">
+    <main class="main">
+        <div id="toast"></div>
+        <h1 class="page-title">文件分享</h1>
 
-<div class="container">
-    <div class="share-card">
-        <div class="card-top">
-            <div class="file-icon <?= $file['type'] == 'folder' ? 'folder' : 'file' ?>">
-                <?php if ($file['type'] == 'file' && Helper::isImage($file['name'])): ?>
-                    <img src="/file-content?id=<?= (int)$file['id'] ?>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">
-                <?php elseif ($file['type'] == 'folder'): ?>
-                    <i class="fas fa-folder"></i>
-                <?php else: ?>
-                    <i class="fas fa-file"></i>
-                <?php endif; ?>
-            </div>
-            <div class="file-name"><?= Helper::e($file['name']) ?></div>
-            <div class="file-meta">
-                <?php if ($file['type'] == 'file'): ?>
-                    <?= Helper::formatSize($file['size']) ?>
-                <?php else: ?>
-                    文件夹
-                <?php endif; ?>
-            </div>
-            
-            <div class="share-info">
-                <div class="row">
-                    <span class="label">分享者</span>
-                    <span class="value"><?= Helper::e($share['username'] ?? '未知用户') ?></span>
-                </div>
-                <?php if ($share['expire_at']): ?>
-                    <div class="row">
-                        <span class="label">有效期</span>
-                        <?php if (strtotime($share['expire_at']) > time()): ?>
-                            <span class="value ok">至 <?= date('m-d H:i', strtotime($share['expire_at'])) ?></span>
+        <div class="card">
+            <div class="card-body">
+                <div class="flex gap16" style="align-items:flex-start;flex-wrap:wrap">
+                    <div class="file-icon" style="width:64px;height:64px;border-radius:var(--radius)">
+                        <?php if (!$isFolder && !empty($file['thumbnail'])): ?>
+                            <img src="/file-thumbnail?id=<?= (int)$file['id'] ?>" style="width:100%;height:100%;object-fit:cover" alt="">
                         <?php else: ?>
-                            <span class="value warn">已过期</span>
+                            <i class="fas fa-<?= $isFolder ? 'folder' : 'file' ?>" style="font-size:26px;color:<?= $isFolder ? '#e8a33d' : 'var(--text-3)' ?>"></i>
                         <?php endif; ?>
                     </div>
-                <?php endif; ?>
-                <?php if ($share['max_downloads'] > 0): ?>
-                    <div class="row">
-                        <span class="label">下载次数</span>
-                        <span class="value"><?= $share['download_count'] ?> / <?= $share['max_downloads'] ?></span>
+                    <div style="flex:1;min-width:200px">
+                        <div style="font-size:16px;font-weight:600;word-break:break-all"><?= Helper::e($file['name'] ?? '') ?></div>
+                        <div class="muted" style="font-size:13px;margin-top:4px">
+                            <?= $isFolder ? '文件夹' : Helper::formatSize((int)($file['size'] ?? 0)) ?>
+                            · 分享于 <?= Helper::e($share['created_at'] ?? '') ?>
+                            · <?= (int)($share['view_count'] ?? 0) ?> 次浏览
+                        </div>
+                        <div class="flex gap8 mt8" style="flex-wrap:wrap">
+                            <?php if (!empty($share['password'])): ?><span class="badge badge-gray"><i class="fas fa-lock"></i>需密码</span><?php endif; ?>
+                            <?php if (!empty($share['expire_at'])): ?><span class="badge badge-gray">有效期至 <?= Helper::e($share['expire_at']) ?></span><?php endif; ?>
+                            <?php if ((int)($share['max_downloads'] ?? 0) > 0): ?><span class="badge badge-gray">限 <?= (int)$share['max_downloads'] ?> 次下载</span><?php endif; ?>
+                        </div>
                     </div>
-                <?php endif; ?>
-                <div class="row">
-                    <span class="label">访问次数</span>
-                    <span class="value"><?= (int)($share['view_count'] ?? 0) ?></span>
                 </div>
+                <?php if (!$isFolder): ?>
+                <div class="mt16" id="downloadArea">
+                    <button class="btn btn-primary" onclick="downloadFile(<?= (int)$file['id'] ?>)"><i class="fas fa-download"></i>下载</button>
+                    <?php if (Session::isLoggedIn()): ?>
+                        <button class="btn btn-outline" onclick="saveToDisk(<?= (int)$file['id'] ?>)"><i class="fas fa-copy"></i>保存到我的网盘</button>
+                    <?php endif; ?>
+                    <?php $mime = Helper::getMimeType($file['name'] ?? ''); ?>
+                    <?php if (strpos($mime, 'image/') === 0 || strpos($mime, 'video/') === 0 || strpos($mime, 'audio/') === 0 || $mime === 'application/pdf'): ?>
+                        <button class="btn btn-ghost" onclick="toggleInline()"><i class="fas fa-eye"></i>在线预览</button>
+                    <?php endif; ?>
+                </div>
+                <?php else: ?>
+                <div class="mt16 flex gap8" style="flex-wrap:wrap">
+                    <?php if (Session::isLoggedIn()): ?>
+                        <button class="btn btn-outline" onclick="saveToDisk(<?= (int)$file['id'] ?>)"><i class="fas fa-copy"></i>保存整个文件夹到我的网盘</button>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
             </div>
-            
-            <div id="alert-box" class="alert-box"></div>
         </div>
-        
-        <div class="card-actions">
-            <?php if ($file['type'] == 'file'): ?>
-                <button class="btn btn-primary" onclick="downloadShare()">
-                    <i class="fas fa-download"></i> 下载文件
-                </button>
-            <?php endif; ?>
-            
-            <?php if (Session::isLoggedIn()): ?>
-                <button class="btn btn-outline" onclick="saveToMyDisk(<?= $file['id'] ?>)">
-                    <i class="fas fa-cloud-upload-alt"></i> 转存到我的网盘
-                </button>
-            <?php else: ?>
-                <a href="/login" class="btn btn-outline">
-                    <i class="fas fa-sign-in-alt"></i> 登录后转存到网盘
-                </a>
-            <?php endif; ?>
+
+        <?php if (!$isFolder): ?>
+        <div class="card mt16" id="inlineBox" style="display:none">
+            <div class="card-body" style="text-align:center;background:var(--bg);border-radius:0 0 var(--radius) var(--radius)">
+                <?php $mime = Helper::getMimeType($file['name'] ?? ''); ?>
+                <?php if (strpos($mime, 'image/') === 0): ?>
+                    <img src="/download?token={{TOKEN}}" style="max-width:100%;max-height:70vh" alt="">
+                <?php elseif (strpos($mime, 'video/') === 0): ?>
+                    <video src="/download?token={{TOKEN}}" controls style="max-width:100%;max-height:70vh"></video>
+                <?php elseif (strpos($mime, 'audio/') === 0): ?>
+                    <audio src="/download?token={{TOKEN}}" controls style="width:100%"></audio>
+                <?php elseif ($mime === 'application/pdf'): ?>
+                    <iframe src="/download?token={{TOKEN}}" style="width:100%;height:70vh;border:0"></iframe>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
+        <?php endif; ?>
+
+        <?php if ($isFolder): ?>
+        <div class="card mt16">
+            <div class="card-head"><h2>文件夹内容</h2><span class="sub" id="crumb"><?= Helper::e($file['name'] ?? '') ?></span></div>
+            <div id="folderList"><div class="empty"><i class="fas fa-spinner fa-spin"></i><p>加载中…</p></div></div>
+        </div>
+        <?php endif; ?>
+    </main>
 </div>
 
-<div class="footer">
-    Powered by <?= Helper::e($brand) ?>
-</div>
-
+<script src="/js/app.js"></script>
 <script>
-function saveToMyDisk(fileId) {
-    var shareCode = '<?= $share['share_code'] ?>';
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/share/save', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-    if (csrfMeta) xhr.setRequestHeader('X-CSRF-Token', csrfMeta.content);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            try {
-                var json = JSON.parse(xhr.responseText);
-                var box = document.getElementById('alert-box');
-                if (json.code === 0) {
-                    box.className = 'alert-box success';
-                    box.textContent = '已保存到我的网盘根目录';
-                } else {
-                    box.className = 'alert-box error';
-                    box.textContent = json.message || '保存失败';
-                }
-            } catch(e) {
-                alert('请求失败');
-            }
-        }
-    };
-    xhr.send(JSON.stringify({ file_id: fileId, share_code: shareCode }));
+var SHARE_CODE = '<?= Helper::e($share['share_code']) ?>';
+function toast(msg, ok) {
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.className = ok === false ? 'err' : 'ok'; t.style.display = 'block';
+    setTimeout(function () { t.style.display = 'none'; }, 2600);
 }
-
-function downloadShare() {
-    var shareCode = '<?= $share['share_code'] ?>';
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/share/download-token', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-    if (csrfMeta) xhr.setRequestHeader('X-CSRF-Token', csrfMeta.content);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            try {
-                var json = JSON.parse(xhr.responseText);
-                var box = document.getElementById('alert-box');
-                if (json.code === 0) {
-                    window.location.href = '/download?token=' + json.data.token;
-                } else {
-                    box.className = 'alert-box error';
-                    box.textContent = json.message || '获取下载链接失败';
-                }
-            } catch(e) {
-                alert('获取下载链接失败');
-            }
-        }
-    };
-    xhr.send(JSON.stringify({ share_code: shareCode }));
+function downloadFile(fileId) {
+    apiPost('/api/share/download-token', { share_code: SHARE_CODE, file_id: fileId }, function (json) {
+        window.location.href = '/download?token=' + json.data.token;
+    });
 }
+function saveToDisk(fileId) {
+    apiPost('/api/share/save', { share_code: SHARE_CODE, file_id: fileId }, function (json) {
+        toast('已保存到我的网盘');
+    });
+}
+function toggleInline() {
+    var box = document.getElementById('inlineBox');
+    if (box.style.display === 'none') {
+        // 为内联预览申请一次性 token（预览也消耗下载次数，与站点行为一致）
+        apiPost('/api/share/download-token', { share_code: SHARE_CODE, file_id: '<?= (int)$file['id'] ?>' }, function (json) {
+            box.innerHTML = box.innerHTML.replace(/{{TOKEN}}/g, json.data.token);
+            box.style.display = '';
+        });
+    } else {
+        box.style.display = 'none';
+    }
+}
+<?php if ($isFolder): ?>
+var currentFolder = <?= (int)$file['id'] ?>;
+var crumbTrail = [{ id: currentFolder, name: '<?= Helper::e($file['name'] ?? '') ?>' }];
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function fmtSize(n) {
+    if (!n && n !== 0) return '—';
+    if (n === 0) return '0 B';
+    var u = ['B','KB','MB','GB','TB'], i = 0;
+    while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+    return n.toFixed(i ? 1 : 0) + ' ' + u[i];
+}
+function renderCrumb() {
+    document.getElementById('crumb').innerHTML = crumbTrail.map(function (c, i) {
+        return '<a href="javascript:void(0)" onclick="enterFolder(' + c.id + ', ' + i + ')" style="color:' + (i === crumbTrail.length - 1 ? 'var(--text)' : 'var(--primary)') + '">' + esc(c.name) + '</a>';
+    }).join(' / ');
+}
+function enterFolder(fid, idx) {
+    if (idx !== undefined) crumbTrail = crumbTrail.slice(0, idx + 1);
+    currentFolder = fid;
+    loadFolder();
+}
+function loadFolder() {
+    renderCrumb();
+    var box = document.getElementById('folderList');
+    box.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i><p>加载中…</p></div>';
+    apiPost('/api/share/browse', { share_code: SHARE_CODE, folder_id: currentFolder }, function (json) {
+        var items = json.data.items || [];
+        if (!items.length) { box.innerHTML = '<div class="empty"><p>空文件夹</p></div>'; return; }
+        var html = '<div class="table-wrap"><table class="table"><tbody>';
+        items.forEach(function (it) {
+            var isImg = it.is_image && it.thumbnail;
+            var icon = it.type === 'folder'
+                ? '<i class="fas fa-folder" style="color:#e8a33d"></i>'
+                : (isImg ? '<img src="/file-thumbnail?id=' + it.id + '" style="width:100%;height:100%;object-fit:cover" alt="">' : '<i class="fas fa-file"></i>');
+            html += '<tr><td style="width:52px"><div class="file-icon">' + icon + '</div></td><td>';
+            if (it.type === 'folder') {
+                html += '<a href="javascript:void(0)" onclick="enterFolder(' + it.id + ')" style="color:var(--text)">' + esc(it.name) + '</a>';
+            } else {
+                html += '<span style="color:var(--text)">' + esc(it.name) + '</span>';
+            }
+            html += '</td><td style="width:100px" class="muted num">' + (it.type === 'file' ? fmtSize(parseInt(it.size)) : '—') + '</td>';
+            html += '<td style="width:110px">' + (it.type === 'file' ? '<button class="btn btn-outline btn-sm" onclick="downloadFile(' + it.id + ')"><i class="fas fa-download"></i> 下载</button>' : '') + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+        box.innerHTML = html;
+    });
+}
+loadFolder();
+<?php endif; ?>
 </script>
 </body>
 </html>

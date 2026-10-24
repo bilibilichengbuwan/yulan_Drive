@@ -7,17 +7,21 @@
     <title>注册 - <?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/auth.css">
+    <script src="/js/theme.js"></script>
 </head>
 <body>
+    <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
     <div class="auth-card">
         <div class="auth-head">
-            <div class="logo"><i class="fas fa-user-plus"></i></div>
-            <h2>创建账号</h2>
-            <p>加入 <?= Helper::e($brand) ?>，开启你的云存储</p>
+            <div class="brand-row">
+                <span class="logo"><i class="fas fa-cloud"></i></span>
+                <span class="bname"><?= Helper::e($brand) ?></span>
+            </div>
+            <h2>注册账号</h2>
+            <p>注册后即可使用</p>
         </div>
-        <div class="auth-body">
-            <div id="alert-box"></div>
-            <form id="registerForm">
+        <div id="alert-box"></div>
+        <form id="registerForm">
                 <div class="field">
                     <label class="form-label">用户名</label>
                     <input type="text" class="form-control" name="username" required minlength="3" maxlength="20" autocomplete="username">
@@ -46,7 +50,6 @@
             <div class="auth-foot">
                 <a href="/login">已有账号？返回登录</a>
             </div>
-        </div>
     </div>
     <script src="/js/app.js"></script>
     <script>
