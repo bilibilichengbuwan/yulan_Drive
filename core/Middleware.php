@@ -14,11 +14,22 @@ class Middleware {
             return false;
         }
         $db = Database::getInstance();
-        $user = $db->fetchOne('SELECT id, username, email, is_admin, status, storage_total, storage_used FROM users WHERE id = ? LIMIT 1', [Session::getUserId()]);
+        $user = $db->fetchOne('SELECT id, username, email, is_admin, status, storage_total, storage_used, session_revoked_at FROM users WHERE id = ? LIMIT 1', [Session::getUserId()]);
         if (!$user || (int)$user['status'] !== 1) {
             Session::logout();
             if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
                 Helper::error('账号不存在或已被禁用', 401);
+            }
+            Helper::redirect('/login');
+            return false;
+        }
+        // 登录设备被强制下线（session_revoked_at 晚于本次登录时间）则踢出
+        $revokedAt = $user['session_revoked_at'] ?? null;
+        $loginTime = Session::get('login_time');
+        if ($revokedAt && $loginTime && strtotime($revokedAt) > (int)$loginTime) {
+            Session::logout();
+            if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
+                Helper::error('登录状态已失效，请重新登录', 401);
             }
             Helper::redirect('/login');
             return false;

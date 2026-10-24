@@ -53,6 +53,35 @@ class Session {
         self::set('is_admin', $user['is_admin']);
         self::set('storage_total', $user['storage_total']);
         self::set('storage_used', $user['storage_used']);
+        self::set('login_time', time());
+    }
+
+    /** 记录当前会话为一条登录设备。 */
+    public static function recordDevice() {
+        try {
+            $db = Database::getInstance();
+            $sid = session_id();
+            if (!$sid) return;
+            $db->execute(
+                "INSERT INTO user_sessions (user_id, session_id, user_agent, ip, last_seen, created_at)
+                 VALUES (?, ?, ?, ?, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE last_seen = NOW(), user_agent = VALUES(user_agent), ip = VALUES(ip)",
+                [self::getUserId(), $sid, substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500), (string)Helper::getClientIp()]
+            );
+        } catch (\Throwable $e) {
+            // 设备记录失败不影响登录
+        }
+    }
+
+    /** 注销时移除当前设备的记录。 */
+    public static function forgetDevice() {
+        try {
+            self::start();
+            $sid = session_id();
+            if ($sid) {
+                Database::getInstance()->execute("DELETE FROM user_sessions WHERE session_id = ?", [$sid]);
+            }
+        } catch (\Throwable $e) {}
     }
 
     public static function logout() {

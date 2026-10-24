@@ -4,30 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#f4f6f8">
+    <meta name="theme-color" content="#f5f6f8">
     <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
     <link rel="stylesheet" href="/css/style.css">
     <title>我的文件 - <?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/drawer.css">
+    <script src="/js/theme.js"></script>
     <style>
-        /* 基础样式重置和变量定义 */
+        /* 基础样式重置和变量定义（v1.0.4 扁平化，支持暗色） */
         :root {
-            --primary: #2d8cff;
-            --primary-dark: #1a6dd9;
-            --primary-light: #e8f0fe;
-            --bg: #f4f6f9;
+            --primary: #2f6fed;
+            --primary-dark: #1e5ed8;
+            --primary-light: #eef3fe;
+            --bg: #f5f6f8;
             --card: #ffffff;
-            --text: #1a1d21;
-            --text-secondary: #5b6778;
-            --text-light: #8b98a9;
-            --border: #e2e8ef;
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-            --radius: 10px;
+            --text: #22252a;
+            --text-secondary: #5c6470;
+            --text-light: #9aa3b0;
+            --border: #e4e7ec;
+            --shadow: 0 1px 2px rgba(16, 24, 40, .05);
+            --radius: 8px;
             --radius-sm: 6px;
-            --transition: 0.2s ease;
+            --transition: 0.15s ease;
             --sidebar-width: 230px;
-            --nav-height: 60px;
+            --nav-height: 56px;
+        }
+        [data-theme="dark"] {
+            --primary: #6b9aff;
+            --primary-dark: #5288f2;
+            --primary-light: #1d2a45;
+            --bg: #14161a;
+            --card: #1d2025;
+            --text: #e6e8eb;
+            --text-secondary: #a3abb8;
+            --text-light: #6d7683;
+            --border: #2c3037;
+            --shadow: 0 1px 2px rgba(0, 0, 0, .3);
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -690,6 +703,7 @@
         <span><?= Helper::e($brand) ?></span>
     </a>
     <div class="navbar-right">
+        <button class="icon-btn theme-toggle" title="切换深色 / 浅色" style="margin-right:4px"><i class="fas fa-moon"></i></button>
         <?php if (Session::isAdmin()): ?>
             <a class="nav-link" href="/admin"><i class="fas fa-cog"></i><span> 管理</span></a>
         <?php endif; ?>
@@ -701,7 +715,9 @@
                 <span class="avatar"><?= mb_substr(Session::getUsername(), 0, 1) ?></span>
             </button>
             <div class="dropdown-menu" id="userDropdown">
-                <a href="javascript:void(0)" onclick="openProfileModal()"><i class="fas fa-user"></i>个人中心</a>
+                <a href="/profile"><i class="fas fa-user"></i>个人中心</a>
+                <a href="/starred"><i class="fas fa-star"></i>星标</a>
+                <a href="/offline"><i class="fas fa-cloud-arrow-down"></i>离线下载</a>
                 <div class="divider"></div>
                 <a href="/logout"><i class="fas fa-sign-out-alt"></i>退出登录</a>
             </div>
@@ -731,6 +747,13 @@
         </button>
         <input type="file" id="fileInput" multiple style="display:none" onchange="uploadFilesWithProgress(this.files); this.value='';">
         <div class="sidebar-divider"></div>
+        <div class="menu-label">位置</div>
+        <a href="/starred" class="menu-item">
+            <i class="fas fa-star"></i><span>星标</span>
+        </a>
+        <a href="/offline" class="menu-item">
+            <i class="fas fa-cloud-arrow-down"></i><span>离线下载</span>
+        </a>
         <a href="/trash" class="menu-item">
             <i class="fas fa-trash"></i><span>回收站</span>
         </a>
@@ -835,16 +858,25 @@
                                             <span class="fname-text"><?= Helper::e($file['name']) ?></span>
                                         </a>
                                     <?php endif; ?>
+                                    <?php if (!empty($file['tags'])): ?>
+                                        <div style="margin-top:4px;margin-left:30px">
+                                            <?php foreach (explode(',', $file['tags']) as $_tag): if ($_tag === '') continue; ?>
+                                                <span class="tag-chip"><?= Helper::e($_tag) ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="file-size"><?= $file['type'] == 'file' ? Helper::formatSize($file['size']) : '-' ?></td>
                                 <td class="file-time"><?= date('m-d H:i', strtotime($file['created_at'])) ?></td>
                                 <td>
                                     <div class="file-actions">
+                                        <button class="btn-sm star <?= !empty($file['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= $file['id'] ?>, this)" title="星标"><i class="<?= !empty($file['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
                                         <?php if ($file['type'] == 'file'): ?>
                                             <button class="btn-sm" onclick="downloadFile(<?= $file['id'] ?>)" title="下载"><i class="fas fa-download"></i></button>
                                         <?php endif; ?>
                                         <button class="btn-sm primary" onclick="showShare(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="分享"><i class="fas fa-share"></i></button>
                                         <button class="btn-sm" onclick="showRename(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="重命名"><i class="fas fa-pen"></i></button>
+                                        <button class="btn-sm" onclick="editTags(<?= $file['id'] ?>, '<?= Helper::e($file['tags'] ?? '') ?>')" title="标签"><i class="fas fa-tag"></i></button>
                                         <button class="btn-sm danger" onclick="deleteItem(<?= $file['id'] ?>)" title="删除"><i class="fas fa-trash"></i></button>
                                     </div>
                                 </td>
@@ -873,6 +905,7 @@
                         <div class="fc-name" title="<?= Helper::e($file['name']) ?>"><?= Helper::e($file['name']) ?></div>
                         <div class="fc-meta"><?= $file['type'] == 'file' ? Helper::formatSize($file['size']) : '文件夹' ?></div>
                         <div class="fc-actions">
+                            <button class="btn-sm star <?= !empty($file['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= $file['id'] ?>, this)" title="星标"><i class="<?= !empty($file['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
                             <?php if ($file['type'] == 'file'): ?><button class="btn-sm" onclick="downloadFile(<?= $file['id'] ?>)" title="下载"><i class="fas fa-download"></i></button><?php endif; ?>
                             <button class="btn-sm primary" onclick="showShare(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="分享"><i class="fas fa-share"></i></button>
                             <button class="btn-sm" onclick="showRename(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="重命名"><i class="fas fa-pen"></i></button>

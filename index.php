@@ -56,6 +56,9 @@ require_once __DIR__ . '/core/Middleware.php';
 require_once __DIR__ . '/core/RateLimiter.php';
 require_once __DIR__ . '/core/Schema.php';
 require_once __DIR__ . '/core/Thumbnail.php';
+require_once __DIR__ . '/core/S3Client.php';
+require_once __DIR__ . '/core/Storage.php';
+require_once __DIR__ . '/core/WebDav.php';
 require_once __DIR__ . '/core/Installer.php';
 require_once __DIR__ . '/models/Model.php';
 require_once __DIR__ . '/models/User.php';
@@ -68,6 +71,9 @@ require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/FileController.php';
 require_once __DIR__ . '/controllers/ShareController.php';
 require_once __DIR__ . '/controllers/AdminController.php';
+require_once __DIR__ . '/controllers/ProfileController.php';
+require_once __DIR__ . '/controllers/ApiController.php';
+require_once __DIR__ . '/core/Totp.php';
 
 Installer::check();
 Schema::migrate();
@@ -195,7 +201,7 @@ Router::get('/admin/logs', function() {
 }, [[Middleware::class, 'admin']]);
 
 Router::get('/admin/settings', function() {
-    (new AdminController())->settings();
+    (new AdminController())->settingsPage();
 }, [[Middleware::class, 'admin']]);
 
 Router::post('/api/login', function() {
@@ -262,10 +268,12 @@ Router::post('/api/batch-download', function() {
         Helper::error('创建压缩包失败');
     }
     foreach ($files as $f) {
-        if (!empty($f['path']) && file_exists($f['path'])) {
-            $safeName = basename($f['name']);
-            $zip->addFile($f['path'], $safeName);
-        }
+        if (empty($f['path']) || !Storage::exists($f['path'])) continue;
+        $local = Storage::localTemp($f['path']);
+        if (!$local) continue;
+        $safeName = basename($f['name']);
+        $zip->addFile($local, $safeName);
+        if ($local !== $f['path']) register_shutdown_function(function () use ($local) { @unlink($local); });
     }
     $zip->close();
     header('Content-Type: application/zip');
@@ -292,6 +300,94 @@ Router::post('/api/trash/cleanup', function() {
     (new FileController())->cleanupTrash();
 }, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
 
+/* ---------- v1.0.4：个人中心 / 2FA / 星标 / 标签 / 离线下载 ---------- */
+
+Router::get('/profile', function() {
+    (new ProfileController())->index();
+}, [[Middleware::class, 'auth']]);
+
+Router::post('/api/profile/update', function() {
+    (new ProfileController())->updateProfile();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/devices/revoke', function() {
+    (new ProfileController())->revokeDevices();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/tokens/create', function() {
+    (new ProfileController())->createToken();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/tokens/delete', function() {
+    (new ProfileController())->deleteToken();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/2fa/setup', function() {
+    (new AuthController())->setup2fa();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/2fa/enable', function() {
+    (new AuthController())->enable2fa();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/2fa/disable', function() {
+    (new AuthController())->disable2fa();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/login-2fa', function() {
+    (new AuthController())->login2fa();
+});
+
+Router::get('/starred', function() {
+    (new FileController())->starredList();
+}, [[Middleware::class, 'auth']]);
+
+Router::post('/api/file-star', function() {
+    (new FileController())->toggleStar();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/file-tags', function() {
+    (new FileController())->saveTags();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+Router::get('/offline', function() {
+    (new FileController())->offlinePage();
+}, [[Middleware::class, 'auth']]);
+
+Router::post('/api/offline/create', function() {
+    (new FileController())->offlineCreate();
+}, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
+
+/* ---------- v1.0.4：开放 API v1（Bearer Token，无 CSRF） ---------- */
+
+Router::get('/api/v1/quota', function() {
+    (new ApiController())->quota();
+});
+
+Router::get('/api/v1/files', function() {
+    (new ApiController())->files();
+});
+
+Router::post('/api/v1/files/upload', function() {
+    (new ApiController())->upload();
+});
+
+Router::get('/api/v1/files/{id}/download', function($params) {
+    (new ApiController())->fileDownload($params);
+});
+
+Router::post('/api/v1/files/{id}/delete', function($params) {
+    (new ApiController())->fileDelete($params);
+});
+
+Router::post('/api/v1/shares', function() {
+    (new ApiController())->shareCreate();
+});
+
+Router::get('/api/v1/shares', function() {
+    (new ApiController())->shareList();
+});
+
 Router::get('/api/folder-tree', function() {
     (new FileController())->folderTree();
 }, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
@@ -310,6 +406,10 @@ Router::post('/api/share/verify', function() {
 
 Router::post('/api/share/download-token', function() {
     (new ShareController())->getDownloadToken();
+}, [[Middleware::class, 'csrf']]);
+
+Router::post('/api/share/browse', function() {
+    (new ShareController())->browseFolder();
 }, [[Middleware::class, 'csrf']]);
 
 Router::post('/api/share/save', function() {
@@ -463,5 +563,18 @@ Router::post('/api/admin/update-user', function() {
 Router::post('/api/admin/save-settings', function() {
     (new AdminController())->settings();
 }, [[Middleware::class, 'admin'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/admin/save-storage', function() {
+    (new AdminController())->saveStorage();
+}, [[Middleware::class, 'admin'], [Middleware::class, 'csrf']]);
+
+Router::post('/api/admin/storage-test', function() {
+    (new AdminController())->testStorage();
+}, [[Middleware::class, 'admin'], [Middleware::class, 'csrf']]);
+
+// WebDAV 独立分发（不走常规 Router，方法集不同）
+if (preg_match('#^/dav(/|$)#i', $uri)) {
+    WebDav::handle();
+}
 
 Router::dispatch();

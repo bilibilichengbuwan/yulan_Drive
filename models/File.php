@@ -180,13 +180,13 @@ class File extends Model {
             $this->forceDeleteFolder($id);
         } else {
 
-            if ($item['path'] && file_exists($item['path'])) {
+            if ($item['path'] && \Storage::exists($item['path'])) {
 
                 $sql = "SELECT COUNT(*) as count FROM files WHERE md5 = ? AND id != ?";
                 $count = $this->db->fetchOne($sql, [$item['md5'], $id])['count'];
-                
+
                 if ($count == 0) {
-                    unlink($item['path']);
+                    \Storage::delete($item['path']);
 
                     $this->deleteChunks($item['md5']);
                 }
@@ -211,12 +211,12 @@ class File extends Model {
                 $this->forceDeleteFolder($child['id']);
             } else {
 
-                if ($child['path'] && file_exists($child['path'])) {
+                if ($child['path'] && \Storage::exists($child['path'])) {
                     $sql = "SELECT COUNT(*) as count FROM files WHERE md5 = ? AND id != ?";
                     $count = $this->db->fetchOne($sql, [$child['md5'], $child['id']])['count'];
-                    
+
                     if ($count == 0) {
-                        unlink($child['path']);
+                        \Storage::delete($child['path']);
                         $this->deleteChunks($child['md5']);
                     }
                 }
@@ -269,8 +269,8 @@ class File extends Model {
                 [$node['md5'], $node['id']]
             )['c'];
 
-            if ($refCount === 0 && !empty($node['path']) && file_exists($node['path'])) {
-                @unlink($node['path']);
+            if ($refCount === 0 && !empty($node['path']) && \Storage::exists($node['path'])) {
+                \Storage::delete($node['path']);
                 $this->deleteChunks($node['md5']);
             }
         }
