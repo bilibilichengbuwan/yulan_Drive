@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
-    <title>用户管理 - <?= Helper::e($brand) ?></title>
+    <title><?= lang('用户管理 - ') ?><?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/theme.js"></script>
@@ -14,46 +14,46 @@
 <nav class="topnav">
     <div class="topnav-inner">
         <button class="icon-btn hamburger" onclick="openSide()"><i class="fas fa-bars"></i></button>
-        <a class="brand" href="/admin"><span class="logo"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
-        <div class="nav-links"><a class="keep" href="/">返回前台</a></div>
+        <a class="brand" href="/admin"><span class="logo"><i class="fas fa-cog"></i></span><span><?= lang('管理后台') ?></span></a>
+        <div class="nav-links"><a class="keep" href="/"><?= lang('返回前台') ?></a></div>
         <div class="spacer"></div>
-        <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+        <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
     </div>
 </nav>
 
 <div class="layout">
     <aside class="sidebar" id="sidebar">
         <div class="side-card">
-            <a class="side-link" href="/admin"><i class="fas fa-tachometer-alt"></i>仪表盘</a>
-            <a class="side-link active" href="/admin/users"><i class="fas fa-users"></i>用户管理</a>
-            <a class="side-link" href="/admin/files"><i class="fas fa-folder-open"></i>所有文件</a>
-            <a class="side-link" href="/admin/logs"><i class="fas fa-history"></i>操作日志</a>
+            <a class="side-link" href="/admin"><i class="fas fa-tachometer-alt"></i><?= lang('仪表盘') ?></a>
+            <a class="side-link active" href="/admin/users"><i class="fas fa-users"></i><?= lang('用户管理') ?></a>
+            <a class="side-link" href="/admin/files"><i class="fas fa-folder-open"></i><?= lang('所有文件') ?></a>
+            <a class="side-link" href="/admin/logs"><i class="fas fa-history"></i><?= lang('操作日志') ?></a>
             <div class="side-sep"></div>
-            <a class="side-link" href="/admin/settings"><i class="fas fa-cogs"></i>系统设置</a>
+            <a class="side-link" href="/admin/settings"><i class="fas fa-cogs"></i><?= lang('系统设置') ?></a>
         </div>
     </aside>
     <div id="sideMask"></div>
 
     <main class="main">
         <div id="toast"></div>
-        <h1 class="page-title">用户管理</h1>
+        <h1 class="page-title"><?= lang('用户管理') ?></h1>
 
         <div class="card">
             <div class="card-head">
-                <h2>用户列表</h2><span class="sub">共 <?= (int)($pagination['total'] ?? 0) ?> 人</span>
+                <h2><?= lang('用户列表') ?></h2><span class="sub"><?= lang('共 ') ?><?= (int)($pagination['total'] ?? 0) ?><?= lang(' 人') ?></span>
                 <div class="spacer"></div>
                 <form action="/admin/users" method="GET" class="flex gap8">
-                    <input class="form-control" name="search" placeholder="用户名 / 邮箱" value="<?= Helper::e($search) ?>" style="width:200px">
+                    <input class="form-control" name="search" placeholder="<?= lang('用户名 / 邮箱') ?>" value="<?= Helper::e($search) ?>" style="width:200px">
                     <button class="btn btn-outline btn-sm" type="submit"><i class="fas fa-search"></i></button>
                 </form>
-                <button class="btn btn-primary btn-sm" onclick="openModal('addUserModal')"><i class="fas fa-plus"></i>添加用户</button>
+                <button class="btn btn-primary btn-sm" onclick="openModal('addUserModal')"><i class="fas fa-plus"></i><?= lang('添加用户') ?></button>
             </div>
             <div class="table-wrap">
                 <table class="table">
                     <thead><tr>
-                        <th style="width:60px">ID</th><th>用户名</th><th>邮箱</th>
-                        <th style="width:180px">存储使用</th><th style="width:80px">状态</th>
-                        <th style="width:90px">注册时间</th><th style="width:190px">操作</th>
+                        <th style="width:60px">ID</th><th><?= lang('用户名') ?></th><th><?= lang('邮箱') ?></th>
+                        <th style="width:180px"><?= lang('存储使用') ?></th><th style="width:80px"><?= lang('状态') ?></th>
+                        <th style="width:90px"><?= lang('注册时间') ?></th><th style="width:190px"><?= lang('操作') ?></th>
                     </tr></thead>
                     <tbody>
                     <?php foreach ($users as $user):
@@ -63,21 +63,21 @@
                             <td class="muted num"><?= (int)$user['id'] ?></td>
                             <td>
                                 <?= Helper::e($user['username']) ?>
-                                <?php if ($user['is_admin']): ?><span class="badge badge-warn">管理员</span><?php endif; ?>
+                                <?php if ($user['is_admin']): ?><span class="badge badge-warn"><?= lang('管理员') ?></span><?php endif; ?>
                             </td>
                             <td class="muted"><?= Helper::e($user['email']) ?></td>
                             <td>
                                 <div style="font-size:12.5px"><?= Helper::formatSize($user['storage_used']) ?> / <?= Helper::formatSize($user['storage_total']) ?></div>
                                 <div class="progress" style="margin-top:4px"><span style="width:<?= $percent ?>%;background:<?= $percent > 80 ? 'var(--danger)' : 'var(--primary)' ?>"></span></div>
                             </td>
-                            <td><?= $user['status'] ? '<span class="badge badge-ok">正常</span>' : '<span class="badge badge-danger">禁用</span>' ?></td>
+                            <td><?= $user['status'] ? '<span class="badge badge-ok">' . lang('正常') . '</span>' : '<span class="badge badge-danger">' . lang('禁用') . '</span>' ?></td>
                             <td class="muted"><?= date('Y-m-d', strtotime($user['created_at'])) ?></td>
                             <td>
                                 <?php if (!$user['is_admin']): ?>
                                 <div class="flex gap8">
-                                    <button class="icon-btn" title="调整配额" onclick="openQuotaModal(<?= (int)$user['id'] ?>, '<?= Helper::e($user['username']) ?>', <?= (int)$user['storage_total'] ?>)"><i class="fas fa-database"></i></button>
-                                    <button class="btn btn-outline btn-sm" onclick="toggleStatus(<?= (int)$user['id'] ?>)"><?= $user['status'] ? '禁用' : '启用' ?></button>
-                                    <button class="btn btn-danger-outline btn-sm" onclick="deleteUser(<?= (int)$user['id'] ?>, '<?= Helper::e($user['username']) ?>')">删除</button>
+                                    <button class="icon-btn" title="<?= lang('调整配额') ?>" onclick="openQuotaModal(<?= (int)$user['id'] ?>, '<?= Helper::e($user['username']) ?>', <?= (int)$user['storage_total'] ?>)"><i class="fas fa-database"></i></button>
+                                    <button class="btn btn-outline btn-sm" onclick="toggleStatus(<?= (int)$user['id'] ?>)"><?= $user['status'] ? lang('禁用') : lang('启用') ?></button>
+                                    <button class="btn btn-danger-outline btn-sm" onclick="deleteUser(<?= (int)$user['id'] ?>, '<?= Helper::e($user['username']) ?>')"><?= lang('删除') ?></button>
                                 </div>
                                 <?php else: ?>
                                 <span class="muted">—</span>
@@ -103,16 +103,16 @@
 <!-- 添加用户 -->
 <div class="modal-mask" id="addUserModal">
     <div class="modal">
-        <div class="modal-head">添加用户 <button class="close icon-btn" onclick="closeModal('addUserModal')">&times;</button></div>
+        <div class="modal-head"><?= lang('添加用户 ') ?><button class="close icon-btn" onclick="closeModal('addUserModal')">&times;</button></div>
         <div class="modal-body">
-            <div class="field"><label class="form-label">用户名</label><input class="form-control" id="add_username"></div>
-            <div class="field"><label class="form-label">邮箱</label><input class="form-control" id="add_email" type="email"></div>
-            <div class="field"><label class="form-label">密码</label><input class="form-control" id="add_password" type="text"></div>
-            <div class="field"><label class="form-label">存储配额 (GB)</label><input class="form-control" id="add_storage" type="number" value="10" min="1"></div>
+            <div class="field"><label class="form-label"><?= lang('用户名') ?></label><input class="form-control" id="add_username"></div>
+            <div class="field"><label class="form-label"><?= lang('邮箱') ?></label><input class="form-control" id="add_email" type="email"></div>
+            <div class="field"><label class="form-label"><?= lang('密码') ?></label><input class="form-control" id="add_password" type="text"></div>
+            <div class="field"><label class="form-label"><?= lang('存储配额 (GB)') ?></label><input class="form-control" id="add_storage" type="number" value="10" min="1"></div>
         </div>
         <div class="modal-foot">
-            <button class="btn btn-outline" onclick="closeModal('addUserModal')">取消</button>
-            <button class="btn btn-primary" onclick="addUser()">确定</button>
+            <button class="btn btn-outline" onclick="closeModal('addUserModal')"><?= lang('取消') ?></button>
+            <button class="btn btn-primary" onclick="addUser()"><?= lang('确定') ?></button>
         </div>
     </div>
 </div>
@@ -120,15 +120,15 @@
 <!-- 调整配额 -->
 <div class="modal-mask" id="quotaModal">
     <div class="modal" style="max-width:380px">
-        <div class="modal-head">调整配额 - <span id="quota_username"></span> <button class="close icon-btn" onclick="closeModal('quotaModal')">&times;</button></div>
+        <div class="modal-head"><?= lang('调整配额 - ') ?><span id="quota_username"></span> <button class="close icon-btn" onclick="closeModal('quotaModal')">&times;</button></div>
         <div class="modal-body">
             <input type="hidden" id="quota_user_id">
-            <label class="form-label">存储配额 (GB)</label>
+            <label class="form-label"><?= lang('存储配额 (GB)') ?></label>
             <input class="form-control" id="quota_storage" type="number" min="1">
         </div>
         <div class="modal-foot">
-            <button class="btn btn-outline" onclick="closeModal('quotaModal')">取消</button>
-            <button class="btn btn-primary" onclick="saveQuota()">确定</button>
+            <button class="btn btn-outline" onclick="closeModal('quotaModal')"><?= lang('取消') ?></button>
+            <button class="btn btn-primary" onclick="saveQuota()"><?= lang('确定') ?></button>
         </div>
     </div>
 </div>
@@ -169,5 +169,6 @@ function saveQuota() {
     });
 }
 </script>
+<?= I18n::footer() ?>
 </body>
 </html>

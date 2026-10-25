@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
-    <title>我的分享 - <?= Helper::e($brand) ?></title>
+    <title><?= lang('我的分享 - ') ?><?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/theme.js"></script>
@@ -16,39 +16,39 @@
         <button class="icon-btn hamburger" onclick="openSide()"><i class="fas fa-bars"></i></button>
         <a class="brand" href="/dashboard"><span class="logo"><i class="fas fa-cloud"></i></span><span><?= Helper::e($brand) ?></span></a>
         <div class="spacer"></div>
-        <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+        <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
     </div>
 </nav>
 
 <div class="layout">
     <aside class="sidebar" id="sidebar">
         <div class="side-card">
-            <a class="side-link" href="/dashboard"><i class="fas fa-folder"></i>我的文件</a>
-            <a class="side-link" href="/starred"><i class="fas fa-star"></i>星标</a>
-            <a class="side-link" href="/offline"><i class="fas fa-cloud-arrow-down"></i>离线下载</a>
-            <a class="side-link" href="/trash"><i class="fas fa-trash-can"></i>回收站</a>
-            <a class="side-link active" href="/share/my"><i class="fas fa-share-nodes"></i>我的分享</a>
+            <a class="side-link" href="/dashboard"><i class="fas fa-folder"></i><?= lang('我的文件') ?></a>
+            <a class="side-link" href="/starred"><i class="fas fa-star"></i><?= lang('星标') ?></a>
+            <a class="side-link" href="/offline"><i class="fas fa-cloud-arrow-down"></i><?= lang('离线下载') ?></a>
+            <a class="side-link" href="/trash"><i class="fas fa-trash-can"></i><?= lang('回收站') ?></a>
+            <a class="side-link active" href="/share/my"><i class="fas fa-share-nodes"></i><?= lang('我的分享') ?></a>
             <div class="side-sep"></div>
-            <a class="side-link" href="/profile"><i class="fas fa-user"></i>个人中心</a>
+            <a class="side-link" href="/profile"><i class="fas fa-user"></i><?= lang('个人中心') ?></a>
         </div>
     </aside>
     <div id="sideMask"></div>
 
     <main class="main">
         <div id="toast"></div>
-        <h1 class="page-title">我的分享</h1>
+        <h1 class="page-title"><?= lang('我的分享') ?></h1>
 
         <div class="card">
-            <div class="card-head"><h2>分享列表</h2><span class="sub">共 <?= (int)($pagination['total'] ?? 0) ?> 条</span></div>
+            <div class="card-head"><h2><?= lang('分享列表') ?></h2><span class="sub"><?= lang('共 ') ?><?= (int)($pagination['total'] ?? 0) ?><?= lang(' 条') ?></span></div>
             <?php if (empty($shares)): ?>
-                <div class="empty"><i class="fas fa-share-nodes"></i><p>还没有创建分享。在文件列表点击「分享」即可创建。</p></div>
+                <div class="empty"><i class="fas fa-share-nodes"></i><p><?= lang('还没有创建分享。在文件列表点击「分享」即可创建。') ?></p></div>
             <?php else: ?>
             <div class="table-wrap">
                 <table class="table">
                     <thead><tr>
-                        <th>内容</th><th style="width:90px">访问</th><th style="width:110px">下载</th>
-                        <th style="width:110px">密码</th><th style="width:150px">过期时间</th>
-                        <th style="width:150px">创建时间</th><th style="width:150px">操作</th>
+                        <th><?= lang('内容') ?></th><th style="width:90px"><?= lang('访问') ?></th><th style="width:110px"><?= lang('下载') ?></th>
+                        <th style="width:110px"><?= lang('密码') ?></th><th style="width:150px"><?= lang('过期时间') ?></th>
+                        <th style="width:150px"><?= lang('创建时间') ?></th><th style="width:150px"><?= lang('操作') ?></th>
                     </tr></thead>
                     <tbody>
                     <?php foreach ($shares as $s):
@@ -62,7 +62,7 @@
                                         <i class="fas fa-<?= ($s['file_type'] ?? 'file') === 'folder' ? 'folder' : 'file' ?>"></i>
                                     </div>
                                     <div style="min-width:0">
-                                        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px"><?= Helper::e($s['file_name'] ?? '（已删除）') ?></div>
+                                        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px"><?= Helper::e($s['file_name'] ?? lang('（已删除）')) ?></div>
                                         <a href="/share/<?= Helper::e($s['share_code']) ?>" style="font-size:12px">/share/<?= Helper::e($s['share_code']) ?></a>
                                     </div>
                                 </div>
@@ -71,19 +71,19 @@
                             <td class="num">
                                 <?= (int)$s['download_count'] ?><?= (int)$s['max_downloads'] > 0 ? ' / ' . (int)$s['max_downloads'] : '' ?>
                             </td>
-                            <td><?= $s['password'] ? '<span class="badge badge-gray"><i class="fas fa-lock"></i> 有</span>' : '<span class="muted">无</span>' ?></td>
+                            <td><?= $s['password'] ? '<span class="badge badge-gray"><i class="fas fa-lock"></i>' . lang('有') . '</span>' : '<span class="muted">' . lang('无') . '</span>' ?></td>
                             <td>
-                                <?php if ($expired): ?><span class="badge badge-danger">已过期</span>
-                                <?php elseif ($maxed): ?><span class="badge badge-warn">已达上限</span>
-                                <?php elseif (empty($s['expire_at'])): ?><span class="muted">永久</span>
+                                <?php if ($expired): ?><span class="badge badge-danger"><?= lang('已过期') ?></span>
+                                <?php elseif ($maxed): ?><span class="badge badge-warn"><?= lang('已达上限') ?></span>
+                                <?php elseif (empty($s['expire_at'])): ?><span class="muted"><?= lang('永久') ?></span>
                                 <?php else: ?><span class="muted"><?= Helper::e($s['expire_at']) ?></span><?php endif; ?>
                             </td>
                             <td class="muted"><?= Helper::e($s['created_at']) ?></td>
                             <td>
                                 <div class="flex gap8">
-                                    <a class="icon-btn" title="打开" href="/share/<?= Helper::e($s['share_code']) ?>"><i class="fas fa-arrow-up-right-from-square"></i></a>
-                                    <button class="icon-btn" title="复制链接" onclick="copyShare('<?= Helper::e($s['share_code']) ?>')"><i class="fas fa-copy"></i></button>
-                                    <button class="icon-btn danger" title="取消分享" onclick="cancelShare(<?= (int)$s['id'] ?>)"><i class="fas fa-ban"></i></button>
+                                    <a class="icon-btn" title="<?= lang('打开') ?>" href="/share/<?= Helper::e($s['share_code']) ?>"><i class="fas fa-arrow-up-right-from-square"></i></a>
+                                    <button class="icon-btn" title="<?= lang('复制链接') ?>" onclick="copyShare('<?= Helper::e($s['share_code']) ?>')"><i class="fas fa-copy"></i></button>
+                                    <button class="icon-btn danger" title="<?= lang('取消分享') ?>" onclick="cancelShare(<?= (int)$s['id'] ?>)"><i class="fas fa-ban"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -121,5 +121,6 @@ function cancelShare(id) {
     apiPost('/api/share/cancel', { id: id }, function () { location.reload(); });
 }
 </script>
+<?= I18n::footer() ?>
 </body>
 </html>

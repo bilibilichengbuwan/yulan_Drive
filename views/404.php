@@ -10,9 +10,10 @@
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px">
         <div class="card" style="max-width:400px;width:100%;padding:40px 28px;text-align:center">
             <div style="font-size:44px;font-weight:600;color:var(--text-3)">404</div>
-            <p style="font-size:14px;color:var(--text-2);margin:10px 0 22px">页面不存在或已被删除</p>
-            <a href="/" class="btn btn-primary">返回首页</a>
+            <p style="font-size:14px;color:var(--text-2);margin:10px 0 22px"><?= lang('页面不存在或已被删除') ?></p>
+            <a href="/" class="btn btn-primary"><?= lang('返回首页') ?></a>
         </div>
     </div>
+<?= I18n::footer() ?>
 </body>
 </html>

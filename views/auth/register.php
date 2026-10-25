@@ -4,51 +4,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注册 - <?= Helper::e($brand) ?></title>
+    <title><?= lang('注册 - ') ?><?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/ui.css">
     <script src="/js/theme.js"></script>
 </head>
 <body class="auth-body">
-    <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+    <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
     <div class="auth-card">
         <div class="auth-head">
             <div class="brand-row">
                 <span class="logo"><i class="fas fa-cloud"></i></span>
                 <span class="bname"><?= Helper::e($brand) ?></span>
             </div>
-            <h2>注册账号</h2>
-            <p>注册后即可使用</p>
+            <h2><?= lang('注册账号') ?></h2>
+            <p><?= lang('注册后即可使用') ?></p>
         </div>
         <div id="alert-box"></div>
         <form id="registerForm">
                 <div class="field">
-                    <label class="form-label">用户名</label>
+                    <label class="form-label"><?= lang('用户名') ?></label>
                     <input type="text" class="form-control" name="username" required minlength="3" maxlength="20" autocomplete="username">
                 </div>
                 <div class="field">
-                    <label class="form-label">邮箱</label>
+                    <label class="form-label"><?= lang('邮箱') ?></label>
                     <input type="email" class="form-control" name="email" required autocomplete="email">
                 </div>
                 <div class="field">
-                    <label class="form-label">验证码</label>
+                    <label class="form-label"><?= lang('验证码') ?></label>
                     <div class="input-group">
-                        <input type="text" class="form-control" name="verify_code" required maxlength="6" placeholder="邮箱验证码">
-                        <button type="button" class="btn btn-outline-secondary" id="sendCodeBtn">发送验证码</button>
+                        <input type="text" class="form-control" name="verify_code" required maxlength="6" placeholder="<?= lang('邮箱验证码') ?>">
+                        <button type="button" class="btn btn-outline-secondary" id="sendCodeBtn"><?= lang('发送验证码') ?></button>
                     </div>
                 </div>
                 <div class="field">
-                    <label class="form-label">密码</label>
+                    <label class="form-label"><?= lang('密码') ?></label>
                     <input type="password" class="form-control" name="password" required minlength="6" autocomplete="new-password">
                 </div>
                 <div class="field">
-                    <label class="form-label">确认密码</label>
+                    <label class="form-label"><?= lang('确认密码') ?></label>
                     <input type="password" class="form-control" name="confirm_password" required autocomplete="new-password">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">注 册</button>
+                <button type="submit" class="btn btn-primary btn-block"><?= lang('注 册') ?></button>
             </form>
             <div class="auth-foot">
-                <a href="/login">已有账号？返回登录</a>
+                <a href="/login"><?= lang('已有账号？返回登录') ?></a>
             </div>
     </div>
     <script src="/js/app.js"></script>
@@ -106,5 +106,6 @@
         }
     });
     </script>
+<?= I18n::footer() ?>
 </body>
 </html>

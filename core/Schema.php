@@ -4,6 +4,7 @@
  * 增量 schema 迁移（幂等）。
  *
  * v1.0.3：files.thumbnail（缩略图路径）、shares.view_count（访问计数）
+ * v1.0.5：多语言（中/英/文言文）、文件大小列清晰化、移动端长文本适配
  * v1.0.4：files.starred / files.tags（星标与标签）、users.nickname / totp_secret /
  *         totp_enabled / notify_email、user_sessions（登录设备）、api_tokens（开放 API）、
  *         offline_tasks（离线下载）

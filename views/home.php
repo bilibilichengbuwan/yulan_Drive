@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><?= Helper::e(Setting::getBrandName()) ?> · 个人网盘</title>
+    <title><?= Helper::e(Setting::getBrandName()) ?> ·<?= lang(' 个人网盘') ?></title>
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="/js/theme.js"></script>
@@ -61,99 +61,99 @@
             </a>
             <div class="nav-links">
                 <?php Session::start(); if (Session::isLoggedIn()): ?>
-                    <a href="/dashboard">我的文件</a>
-                    <?php if (Session::isAdmin()): ?><a href="/admin">管理后台</a><?php endif; ?>
-                    <a class="keep" href="/profile">个人中心</a>
-                    <a href="/logout">退出</a>
+                    <a href="/dashboard"><?= lang('我的文件') ?></a>
+                    <?php if (Session::isAdmin()): ?><a href="/admin"><?= lang('管理后台') ?></a><?php endif; ?>
+                    <a class="keep" href="/profile"><?= lang('个人中心') ?></a>
+                    <a href="/logout"><?= lang('退出') ?></a>
                 <?php else: ?>
-                    <a href="/login">登录</a>
+                    <a href="/login"><?= lang('登录') ?></a>
                 <?php endif; ?>
             </div>
             <div class="spacer"></div>
-            <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+            <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
             <?php if (!Session::isLoggedIn()): ?>
-                <a class="btn btn-primary" href="/register">注册</a>
+                <a class="btn btn-primary" href="/register"><?= lang('注册') ?></a>
             <?php endif; ?>
         </div>
     </nav>
 
     <header class="hero">
         <div class="hero-text">
-            <h1>自己的网盘，<br>文件放哪、给谁看，自己说了算</h1>
-            <p class="lead">
+            <h1><?= lang('自己的网盘，') ?><br><?= lang('文件放哪、给谁看，自己说了算') ?></h1>
+            <p class="lead"><?= lang('
                 上传文件、生成分享链接、需要时再取回。支持文件夹分享、图片视频缩略图、
                 大文件分片上传，也支持把存储接到自己的对象存储（S3 / OSS / COS / MinIO）。
-            </p>
+            ') ?></p>
             <div class="hero-cta">
                 <?php if (Session::isLoggedIn()): ?>
-                    <a class="btn btn-primary" href="/dashboard"><i class="fas fa-folder-open"></i>进入网盘</a>
-                    <a class="btn btn-outline" href="/profile">个人中心</a>
+                    <a class="btn btn-primary" href="/dashboard"><i class="fas fa-folder-open"></i><?= lang('进入网盘') ?></a>
+                    <a class="btn btn-outline" href="/profile"><?= lang('个人中心') ?></a>
                 <?php else: ?>
-                    <a class="btn btn-primary" href="/register">注册账号</a>
-                    <a class="btn btn-outline" href="/login">登录</a>
+                    <a class="btn btn-primary" href="/register"><?= lang('注册账号') ?></a>
+                    <a class="btn btn-outline" href="/login"><?= lang('登录') ?></a>
                 <?php endif; ?>
             </div>
-            <p class="hero-note">文件保存在服务器上，密码加密存储，不接入任何第三方统计。</p>
+            <p class="hero-note"><?= lang('文件保存在服务器上，密码加密存储，不接入任何第三方统计。') ?></p>
         </div>
 
         <div class="hero-panel">
             <div class="mock" aria-hidden="true">
                 <div class="mock-bar">
                     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    <span class="addr"><?= Helper::e(Setting::getBrandName()) ?>/我的文件</span>
+                    <span class="addr"><?= Helper::e(Setting::getBrandName()) ?><?= lang('/我的文件') ?></span>
                 </div>
                 <div class="mock-body">
-                    <div class="mock-row"><i class="fas fa-folder"></i>照片<i class="fas fa-star" style="color:#e8a33d"></i><span class="sz">—</span></div>
-                    <div class="mock-row"><i class="fas fa-folder"></i>工作文档<span class="sz">—</span></div>
+                    <div class="mock-row"><i class="fas fa-folder"></i><?= lang('照片') ?><i class="fas fa-star" style="color:#e8a33d"></i><span class="sz">—</span></div>
+                    <div class="mock-row"><i class="fas fa-folder"></i><?= lang('工作文档') ?><span class="sz">—</span></div>
                     <div class="mock-row"><i class="fas fa-file-image"></i>DSC_0248.jpg<i class="fas fa-link"></i><span class="sz">4.2 MB</span></div>
-                    <div class="mock-row"><i class="fas fa-file-video"></i>旅游记录.mp4<span class="sz">1.3 GB</span></div>
-                    <div class="mock-row"><i class="fas fa-file-pdf"></i>合同-2026.pdf<span class="sz">856 KB</span></div>
-                    <div class="mock-row"><i class="fas fa-file-archive"></i>备份.zip<span class="sz">2.8 GB</span></div>
+                    <div class="mock-row"><i class="fas fa-file-video"></i><?= lang('旅游记录.mp4') ?><span class="sz">1.3 GB</span></div>
+                    <div class="mock-row"><i class="fas fa-file-pdf"></i><?= lang('合同-2026.pdf') ?><span class="sz">856 KB</span></div>
+                    <div class="mock-row"><i class="fas fa-file-archive"></i><?= lang('备份.zip') ?><span class="sz">2.8 GB</span></div>
                 </div>
             </div>
         </div>
     </header>
 
     <section class="section">
-        <h2>功能</h2>
-        <p class="sub">按一个自用网盘该有的样子做，不塞用不上的东西。</p>
+        <h2><?= lang('功能') ?></h2>
+        <p class="sub"><?= lang('按一个自用网盘该有的样子做，不塞用不上的东西。') ?></p>
         <div class="feat-grid">
             <div class="feat">
-                <h3><i class="fas fa-upload"></i>上传与断点续传</h3>
-                <p>浏览器拖拽上传，大文件自动分片，中断后可续传；同内容文件秒传。</p>
+                <h3><i class="fas fa-upload"></i><?= lang('上传与断点续传') ?></h3>
+                <p><?= lang('浏览器拖拽上传，大文件自动分片，中断后可续传；同内容文件秒传。') ?></p>
             </div>
             <div class="feat">
-                <h3><i class="fas fa-share-nodes"></i>文件与文件夹分享</h3>
-                <p>单文件或整个文件夹生成链接，可设密码、有效期与下载次数。</p>
+                <h3><i class="fas fa-share-nodes"></i><?= lang('文件与文件夹分享') ?></h3>
+                <p><?= lang('单文件或整个文件夹生成链接，可设密码、有效期与下载次数。') ?></p>
             </div>
             <div class="feat">
-                <h3><i class="fas fa-image"></i>图片视频预览</h3>
-                <p>图片生成缩略图，视频音频在线播放，PDF 和常见文本直接阅读。</p>
+                <h3><i class="fas fa-image"></i><?= lang('图片视频预览') ?></h3>
+                <p><?= lang('图片生成缩略图，视频音频在线播放，PDF 和常见文本直接阅读。') ?></p>
             </div>
             <div class="feat">
-                <h3><i class="fas fa-database"></i>对象存储</h3>
-                <p>存储后端可切换为 S3 兼容服务：阿里云 OSS、腾讯云 COS、MinIO、R2 均可。</p>
+                <h3><i class="fas fa-database"></i><?= lang('对象存储') ?></h3>
+                <p><?= lang('存储后端可切换为 S3 兼容服务：阿里云 OSS、腾讯云 COS、MinIO、R2 均可。') ?></p>
             </div>
             <div class="feat">
-                <h3><i class="fas fa-shield-halved"></i>安全</h3>
-                <p>两步验证（TOTP）、登录设备管理、CSRF 与上传类型白名单。</p>
+                <h3><i class="fas fa-shield-halved"></i><?= lang('安全') ?></h3>
+                <p><?= lang('两步验证（TOTP）、登录设备管理、CSRF 与上传类型白名单。') ?></p>
             </div>
             <div class="feat">
-                <h3><i class="fas fa-plug"></i>开放接口</h3>
-                <p>REST API 与 WebDAV，第三方客户端和脚本可以直接读写文件。</p>
+                <h3><i class="fas fa-plug"></i><?= lang('开放接口') ?></h3>
+                <p><?= lang('REST API 与 WebDAV，第三方客户端和脚本可以直接读写文件。') ?></p>
             </div>
         </div>
     </section>
 
     <div class="cta-box">
         <div class="cta-inner">
-            <h2>注册一个账号，两分钟后开始传文件</h2>
-            <p>免费提供 10GB 空间，支持回收站恢复。</p>
+            <h2><?= lang('注册一个账号，两分钟后开始传文件') ?></h2>
+            <p><?= lang('免费提供 10GB 空间，支持回收站恢复。') ?></p>
             <?php if (Session::isLoggedIn()): ?>
-                <a class="btn btn-primary" href="/dashboard">进入网盘</a>
+                <a class="btn btn-primary" href="/dashboard"><?= lang('进入网盘') ?></a>
             <?php else: ?>
-                <a class="btn btn-primary" href="/register">注册</a>
-                <a class="btn btn-outline" href="/login">已有账号，登录</a>
+                <a class="btn btn-primary" href="/register"><?= lang('注册') ?></a>
+                <a class="btn btn-outline" href="/login"><?= lang('已有账号，登录') ?></a>
             <?php endif; ?>
         </div>
     </div>
@@ -162,10 +162,11 @@
         <div class="footer-inner">
             <span>© <?= date('Y') ?> <?= Helper::e(Setting::getBrandName()) ?></span>
             <span>
-                <a href="/login">登录</a>
-                <?php if (!Session::isLoggedIn()): ?><a href="/register">注册</a><?php endif; ?>
+                <a href="/login"><?= lang('登录') ?></a>
+                <?php if (!Session::isLoggedIn()): ?><a href="/register"><?= lang('注册') ?></a><?php endif; ?>
             </span>
         </div>
     </footer>
+<?= I18n::footer() ?>
 </body>
 </html>

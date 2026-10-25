@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
-    <title>搜索 - <?= Helper::e($brand) ?></title>
+    <title><?= lang('搜索 - ') ?><?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/theme.js"></script>
@@ -13,37 +13,37 @@
 <body>
 <nav class="topnav">
     <div class="topnav-inner">
-        <button class="icon-btn hamburger" onclick="openSide()" aria-label="打开导航菜单"><i class="fas fa-bars"></i></button>
+        <button class="icon-btn hamburger" onclick="openSide()" aria-label="<?= lang('打开导航菜单') ?>"><i class="fas fa-bars"></i></button>
         <a class="brand" href="/dashboard"><span class="logo"><i class="fas fa-cloud"></i></span><span><?= Helper::e($brand) ?></span></a>
-        <div class="nav-links"><a href="/dashboard">我的文件</a><a href="/starred">星标</a><a href="/offline">离线下载</a></div>
+        <div class="nav-links"><a href="/dashboard"><?= lang('我的文件') ?></a><a href="/starred"><?= lang('星标') ?></a><a href="/offline"><?= lang('离线下载') ?></a></div>
         <div class="spacer"></div>
-        <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+        <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
     </div>
 </nav>
 
 <div class="layout">
     <aside class="sidebar" id="sidebar">
         <div class="side-card">
-            <a class="side-link" href="/dashboard"><i class="fas fa-folder"></i>我的文件</a>
-            <a class="side-link" href="/starred"><i class="fas fa-star"></i>星标</a>
-            <a class="side-link" href="/offline"><i class="fas fa-cloud-arrow-down"></i>离线下载</a>
-            <a class="side-link" href="/trash"><i class="fas fa-trash-can"></i>回收站</a>
-            <a class="side-link" href="/share/my"><i class="fas fa-share-nodes"></i>我的分享</a>
+            <a class="side-link" href="/dashboard"><i class="fas fa-folder"></i><?= lang('我的文件') ?></a>
+            <a class="side-link" href="/starred"><i class="fas fa-star"></i><?= lang('星标') ?></a>
+            <a class="side-link" href="/offline"><i class="fas fa-cloud-arrow-down"></i><?= lang('离线下载') ?></a>
+            <a class="side-link" href="/trash"><i class="fas fa-trash-can"></i><?= lang('回收站') ?></a>
+            <a class="side-link" href="/share/my"><i class="fas fa-share-nodes"></i><?= lang('我的分享') ?></a>
             <div class="side-sep"></div>
-            <a class="side-link" href="/profile"><i class="fas fa-user"></i>个人中心</a>
+            <a class="side-link" href="/profile"><i class="fas fa-user"></i><?= lang('个人中心') ?></a>
         </div>
     </aside>
     <div id="sideMask"></div>
 
     <main class="main">
         <div id="toast"></div>
-        <h1 class="page-title">搜索</h1>
+        <h1 class="page-title"><?= lang('搜索') ?></h1>
 
         <div class="card mb16">
             <div class="card-body">
                 <form method="GET" action="/search" style="display:flex;gap:8px;flex-wrap:wrap">
-                    <input class="form-control" name="keyword" value="<?= Helper::e($keyword) ?>" placeholder="输入文件名关键词" style="flex:1;min-width:220px" autofocus>
-                    <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i>搜索</button>
+                    <input class="form-control" name="keyword" value="<?= Helper::e($keyword) ?>" placeholder="<?= lang('输入文件名关键词') ?>" style="flex:1;min-width:220px" autofocus>
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i><?= lang('搜索') ?></button>
                 </form>
                 <div class="chips mt16">
                     <?php foreach ($types as $k => $label): ?>
@@ -60,15 +60,15 @@
 
         <div class="card">
             <div class="card-head">
-                <h2>结果</h2>
-                <span class="sub">共 <?= (int)($pagination['total'] ?? 0) ?> 项<?php if ($keyword !== ''): ?> · 关键词「<?= Helper::e($keyword) ?>」<?php endif; ?></span>
+                <h2><?= lang('结果') ?></h2>
+                <span class="sub"><?= lang('共 ') ?><?= (int)($pagination['total'] ?? 0) ?><?= lang(' 项') ?><?php if ($keyword !== ''): ?> ·<?= lang(' 关键词「') ?><?= Helper::e($keyword) ?>」<?php endif; ?></span>
             </div>
             <?php if (empty($files)): ?>
-                <div class="empty"><i class="fas fa-search"></i><p>没有匹配的文件</p></div>
+                <div class="empty"><i class="fas fa-search"></i><p><?= lang('没有匹配的文件') ?></p></div>
             <?php else: ?>
             <div class="table-wrap">
                 <table class="table">
-                    <thead><tr><th>名称</th><th style="width:100px">大小</th><th style="width:130px">类型</th><th style="width:150px">时间</th><th style="width:80px">操作</th></tr></thead>
+                    <thead><tr><th><?= lang('名称') ?></th><th style="width:100px"><?= lang('大小') ?></th><th style="width:130px"><?= lang('类型') ?></th><th style="width:150px"><?= lang('时间') ?></th><th style="width:80px"><?= lang('操作') ?></th></tr></thead>
                     <tbody>
                     <?php foreach ($files as $f):
                         $mime = $f['type'] === 'file' ? Helper::getMimeType($f['name']) : '';
@@ -102,12 +102,12 @@
                                 <?php endif; ?>
                             </td>
                             <td class="muted num"><?= $f['type'] === 'file' ? Helper::formatSize((int)$f['size']) : '—' ?></td>
-                            <td class="muted"><?= $f['type'] === 'folder' ? '文件夹' : Helper::e(strtoupper($ext) ?: '文件') ?></td>
+                            <td class="muted"><?= $f['type'] === 'folder' ? lang('文件夹') : Helper::e(strtoupper($ext) ?: lang('文件')) ?></td>
                             <td class="muted"><?= Helper::e($f['created_at']) ?></td>
                             <td>
                                 <div class="flex gap8">
-                                    <?php if ($f['type'] === 'file'): ?><a class="icon-btn" title="下载" href="/download?id=<?= (int)$f['id'] ?>"><i class="fas fa-download"></i></a><?php endif; ?>
-                                    <button class="star-btn <?= !empty($f['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= (int)$f['id'] ?>, this)" title="星标"><i class="<?= !empty($f['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
+                                    <?php if ($f['type'] === 'file'): ?><a class="icon-btn" title="<?= lang('下载') ?>" href="/download?id=<?= (int)$f['id'] ?>"><i class="fas fa-download"></i></a><?php endif; ?>
+                                    <button class="star-btn <?= !empty($f['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= (int)$f['id'] ?>, this)" title="<?= lang('星标') ?>"><i class="<?= !empty($f['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -140,5 +140,6 @@ function toggleStar(id, btn) {
     });
 }
 </script>
+<?= I18n::footer() ?>
 </body>
 </html>

@@ -225,7 +225,11 @@ class AdminController extends Controller {
     /** 设置页（GET 渲染）。 */
     public function settingsPage() {
         $settings = Setting::all();
-        $this->view('admin/settings', ['settings' => $settings]);
+        $appConfig = require __DIR__ . '/../config/app.php';
+        $this->view('admin/settings', [
+            'settings' => $settings,
+            'app_version' => $appConfig['version'] ?? '',
+        ]);
     }
     
     

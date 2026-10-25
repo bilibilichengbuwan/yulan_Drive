@@ -51,7 +51,7 @@ function apiPost(url, data, callback, errorCallback) {
                     if (errorCallback) errorCallback(json);
                 }
             } catch(err) {
-                showAlert('请求失败', 'danger');
+                showAlert(__('请求失败'), 'danger');
             }
         }
     };
@@ -79,7 +79,7 @@ function showCreateFolder() {
 
 function createFolder() {
     var name = document.getElementById('folderName').value.trim();
-    if (!name) { alert('请输入文件夹名称'); return; }
+    if (!name) { alert(__('请输入文件夹名称')); return; }
     apiPost('/api/folder/create', { parent_id: currentFolder, name: name }, function() {
         location.reload();
     });
@@ -94,14 +94,14 @@ function showRename(id, name) {
 function renameItem() {
     var id = document.getElementById('renameId').value;
     var name = document.getElementById('renameName').value.trim();
-    if (!name) { alert('请输入名称'); return; }
+    if (!name) { alert(__('请输入名称')); return; }
     apiPost('/api/rename', { id: id, name: name }, function() {
         location.reload();
     });
 }
 
 function deleteItem(id) {
-    if (!confirm('确定要删除此文件吗？')) return;
+    if (!confirm(__('确定要删除此文件吗？'))) return;
     apiPost('/api/delete', { ids: [id] }, function() {
         location.reload();
     });
@@ -145,7 +145,7 @@ function copyShareLink() {
     link.select();
     link.setSelectionRange(0, 99999);
     document.execCommand('copy');
-    alert('链接已复制到剪贴板');
+    alert(__('链接已复制到剪贴板'));
 }
 
 function uploadFiles(files) {
@@ -168,7 +168,7 @@ function uploadFiles(files) {
                             showAlert(json.message, 'danger');
                         }
                     } catch(err) {
-                        showAlert('上传失败: ' + file.name, 'danger');
+                        showAlert(__('上传失败') + ': ' + file.name, 'danger');
                     }
                 }
             };
@@ -184,7 +184,7 @@ function showChunkUpload() {
 
 function startChunkUpload() {
     var fileInput = document.getElementById('chunkFileInput');
-    if (!fileInput.files.length) { alert('请选择文件'); return; }
+    if (!fileInput.files.length) { alert(__('请选择文件')); return; }
     
     var file = fileInput.files[0];
     var chunkSize = 5 * 1024 * 1024;
@@ -195,12 +195,12 @@ function startChunkUpload() {
     var statusDiv = document.getElementById('chunkStatus');
     
     document.getElementById('chunkProgress').style.display = 'block';
-    statusDiv.innerHTML = '开始上传...';
+    statusDiv.innerHTML = __('开始上传...');
     
     var i = 0;
     function uploadNextChunk() {
         if (i >= totalChunks) {
-            statusDiv.innerHTML = '<span style="color:#10b981">上传完成！</span>';
+            statusDiv.innerHTML = '<span style="color:#10b981">' + __('上传完成！') + '</span>';
             setTimeout(function() { location.reload(); }, 1000);
             return;
         }
@@ -230,16 +230,16 @@ function startChunkUpload() {
                     var percent = Math.round((i + 1) / totalChunks * 100);
                     progressBar.style.width = percent + '%';
                     progressBar.textContent = percent + '%';
-                    statusDiv.innerHTML = '已上传 ' + (i + 1) + '/' + totalChunks + ' 分片';
+                    statusDiv.innerHTML = __('已上传 %s / %s 分片', (i + 1), totalChunks);
                     
                     if (json.code !== 0) {
-                        statusDiv.innerHTML = '<span style="color:#e5484d">上传失败: ' + json.message + '</span>';
+                        statusDiv.innerHTML = '<span style="color:#e5484d">' + __('上传失败') + ': ' + json.message + '</span>';
                         return;
                     }
                     i++;
                     uploadNextChunk();
                 } catch(err) {
-                    statusDiv.innerHTML = '<span style="color:#e5484d">上传失败</span>';
+                    statusDiv.innerHTML = '<span style="color:#e5484d">' + __('上传失败') + '</span>';
                 }
             }
         };
@@ -262,7 +262,7 @@ function updateBatchActions() {
     var countSpan = document.getElementById('selected-count');
     if (selected.length > 0) {
         batchDiv.style.display = 'flex';
-        countSpan.textContent = '已选 ' + selected.length + ' 项';
+        countSpan.textContent = __('已选 %s 项', selected.length);
     } else {
         batchDiv.style.display = 'none';
     }
@@ -279,14 +279,14 @@ function getSelectedIds() {
 
 function batchDelete() {
     var ids = getSelectedIds();
-    if (!ids.length) { alert('请选择文件'); return; }
-    if (!confirm('确定要删除选中的文件吗？')) return;
+    if (!ids.length) { alert(__('请选择文件')); return; }
+    if (!confirm(__('确定要删除选中的文件吗？'))) return;
     apiPost('/api/delete', { ids: ids }, function() { location.reload(); });
 }
 
 function showBatchMove() {
     var ids = getSelectedIds();
-    if (!ids.length) { alert('请选择文件'); return; }
+    if (!ids.length) { alert(__('请选择文件')); return; }
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/api/folder-tree', true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -308,7 +308,7 @@ function moveItems() {
     var ids = getSelectedIds();
     var checked = document.querySelector('#folderTree input[name="target"]:checked');
     var targetId = checked ? checked.value : 0;
-    if (!ids.length) { alert('请选择文件'); return; }
+    if (!ids.length) { alert(__('请选择文件')); return; }
     apiPost('/api/move', { ids: ids, target_id: targetId }, function() { location.reload(); });
 }
 
@@ -337,7 +337,7 @@ function toggleStar(id, btn) {
 }
 
 function editTags(id, tags) {
-    var val = prompt('标签（用空格或逗号分隔，最多 8 个）', tags || '');
+    var val = prompt(__('标签（用空格或逗号分隔，最多 8 个）'), tags || '');
     if (val === null) return;
     apiPost('/api/file-tags', { id: id, tags: val }, function (json) {
         location.reload();

@@ -21,7 +21,7 @@ $actionMap = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
-    <title>操作日志 - <?= Helper::e($brand) ?></title>
+    <title><?= lang('操作日志 - ') ?><?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/theme.js"></script>
@@ -30,52 +30,52 @@ $actionMap = [
 <nav class="topnav">
     <div class="topnav-inner">
         <button class="icon-btn hamburger" onclick="openSide()"><i class="fas fa-bars"></i></button>
-        <a class="brand" href="/admin"><span class="logo"><i class="fas fa-cog"></i></span><span>管理后台</span></a>
-        <div class="nav-links"><a class="keep" href="/">返回前台</a></div>
+        <a class="brand" href="/admin"><span class="logo"><i class="fas fa-cog"></i></span><span><?= lang('管理后台') ?></span></a>
+        <div class="nav-links"><a class="keep" href="/"><?= lang('返回前台') ?></a></div>
         <div class="spacer"></div>
-        <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+        <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
     </div>
 </nav>
 
 <div class="layout">
     <aside class="sidebar" id="sidebar">
         <div class="side-card">
-            <a class="side-link" href="/admin"><i class="fas fa-tachometer-alt"></i>仪表盘</a>
-            <a class="side-link" href="/admin/users"><i class="fas fa-users"></i>用户管理</a>
-            <a class="side-link" href="/admin/files"><i class="fas fa-folder-open"></i>所有文件</a>
-            <a class="side-link active" href="/admin/logs"><i class="fas fa-history"></i>操作日志</a>
+            <a class="side-link" href="/admin"><i class="fas fa-tachometer-alt"></i><?= lang('仪表盘') ?></a>
+            <a class="side-link" href="/admin/users"><i class="fas fa-users"></i><?= lang('用户管理') ?></a>
+            <a class="side-link" href="/admin/files"><i class="fas fa-folder-open"></i><?= lang('所有文件') ?></a>
+            <a class="side-link active" href="/admin/logs"><i class="fas fa-history"></i><?= lang('操作日志') ?></a>
             <div class="side-sep"></div>
-            <a class="side-link" href="/admin/settings"><i class="fas fa-cogs"></i>系统设置</a>
+            <a class="side-link" href="/admin/settings"><i class="fas fa-cogs"></i><?= lang('系统设置') ?></a>
         </div>
     </aside>
     <div id="sideMask"></div>
 
     <main class="main">
-        <h1 class="page-title">操作日志</h1>
+        <h1 class="page-title"><?= lang('操作日志') ?></h1>
 
         <div class="card">
             <div class="card-head">
-                <h2>日志</h2><span class="sub">共 <?= (int)($pagination['total'] ?? 0) ?> 条</span>
+                <h2><?= lang('日志') ?></h2><span class="sub"><?= lang('共 ') ?><?= (int)($pagination['total'] ?? 0) ?><?= lang(' 条') ?></span>
                 <div class="spacer"></div>
                 <form method="GET" action="/admin/logs" class="flex gap8" style="flex-wrap:wrap">
-                    <input class="form-control" name="user_id" placeholder="用户 ID" value="<?= Helper::e((string)($user_id ?? '')) ?>" style="width:100px">
+                    <input class="form-control" name="user_id" placeholder="<?= lang('用户 ID') ?>" value="<?= Helper::e((string)($user_id ?? '')) ?>" style="width:100px">
                     <select class="form-control" name="action" style="width:150px">
-                        <option value="">全部操作</option>
+                        <option value=""><?= lang('全部操作') ?></option>
                         <?php foreach ($actionMap as $k => $label): ?>
                             <option value="<?= Helper::e($k) ?>" <?= ($action ?? '') === $k ? 'selected' : '' ?>><?= Helper::e($label) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <button class="btn btn-outline btn-sm" type="submit"><i class="fas fa-search"></i>筛选</button>
+                    <button class="btn btn-outline btn-sm" type="submit"><i class="fas fa-search"></i><?= lang('筛选') ?></button>
                 </form>
             </div>
             <?php if (empty($logs)): ?>
-                <div class="empty"><i class="fas fa-history"></i><p>暂无日志</p></div>
+                <div class="empty"><i class="fas fa-history"></i><p><?= lang('暂无日志') ?></p></div>
             <?php else: ?>
             <div class="table-wrap">
                 <table class="table">
                     <thead><tr>
-                        <th style="width:70px">ID</th><th style="width:150px">用户</th><th style="width:110px">操作</th>
-                        <th>详情</th><th style="width:150px">时间</th><th style="width:120px">IP</th>
+                        <th style="width:70px">ID</th><th style="width:150px"><?= lang('用户') ?></th><th style="width:110px"><?= lang('操作') ?></th>
+                        <th><?= lang('详情') ?></th><th style="width:150px"><?= lang('时间') ?></th><th style="width:120px">IP</th>
                     </tr></thead>
                     <tbody>
                     <?php foreach ($logs as $log): ?>
@@ -86,7 +86,7 @@ $actionMap = [
                                     <?= Helper::e($log['username']) ?>
                                     <?php if ($log['email']): ?><div class="muted" style="font-size:11.5px"><?= Helper::e($log['email']) ?></div><?php endif; ?>
                                 <?php else: ?>
-                                    <span class="muted">系统</span>
+                                    <span class="muted"><?= lang('系统') ?></span>
                                 <?php endif; ?>
                             </td>
                             <td><span class="badge badge-gray"><?= Helper::e($actionMap[$log['action']] ?? $log['action']) ?></span></td>
@@ -113,5 +113,6 @@ $actionMap = [
 </div>
 
 <script src="/js/app.js"></script>
+<?= I18n::footer() ?>
 </body>
 </html>

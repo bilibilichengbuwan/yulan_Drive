@@ -4,45 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - <?= Helper::e($brand) ?></title>
+    <title><?= lang('登录 - ') ?><?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/ui.css">
     <script src="/js/theme.js"></script>
 </head>
 <body class="auth-body">
-    <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+    <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
     <div class="auth-card">
         <div class="auth-head">
             <div class="brand-row">
                 <span class="logo"><i class="fas fa-cloud"></i></span>
                 <span class="bname"><?= Helper::e($brand) ?></span>
             </div>
-            <h2>登录</h2>
-            <p>输入账号和密码继续</p>
+            <h2><?= lang('登录') ?></h2>
+            <p><?= lang('输入账号和密码继续') ?></p>
         </div>
         <div id="alert-box"></div>
         <form id="loginForm">
             <div class="field">
-                <label class="form-label">用户名 / 邮箱</label>
+                <label class="form-label"><?= lang('用户名 / 邮箱') ?></label>
                 <input type="text" class="form-control" name="email" required autocomplete="username">
             </div>
             <div class="field">
-                <label class="form-label">密码</label>
+                <label class="form-label"><?= lang('密码') ?></label>
                 <input type="password" class="form-control" name="password" required autocomplete="current-password">
             </div>
-            <button type="submit" class="btn btn-primary btn-block">登录</button>
+            <button type="submit" class="btn btn-primary btn-block"><?= lang('登录') ?></button>
         </form>
         <form id="twoFaForm" class="hidden">
-            <div class="alert alert-info" style="background:var(--primary-soft);color:var(--primary)">账号开启了两步验证，请输入验证器 App 中的 6 位动态码。</div>
+            <div class="alert alert-info" style="background:var(--primary-soft);color:var(--primary)"><?= lang('账号开启了两步验证，请输入验证器 App 中的 6 位动态码。') ?></div>
             <div class="field">
-                <label class="form-label">动态验证码</label>
+                <label class="form-label"><?= lang('动态验证码') ?></label>
                 <input type="text" class="form-control" id="totpCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
             </div>
-            <button type="submit" class="btn btn-primary btn-block">验证并登录</button>
+            <button type="submit" class="btn btn-primary btn-block"><?= lang('验证并登录') ?></button>
         </form>
         <div class="auth-foot">
-            <?php if ($registerEnabled): ?><a href="/register">注册账号</a><span class="sep">·</span><?php endif; ?>
-            <a href="/forgot-password">忘记密码</a>
+            <?php if ($registerEnabled): ?><a href="/register"><?= lang('注册账号') ?></a><span class="sep">·</span><?php endif; ?>
+            <a href="/forgot-password"><?= lang('忘记密码') ?></a>
         </div>
     </div>
     <script src="/js/app.js"></script>
@@ -94,5 +94,6 @@
         } catch(err) { showErr('请求失败'); }
     });
     </script>
+<?= I18n::footer() ?>
 </body>
 </html>

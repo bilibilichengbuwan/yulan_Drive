@@ -79,6 +79,9 @@ Installer::check();
 Schema::migrate();
 Session::start();
 
+require_once __DIR__ . '/core/I18n.php';
+I18n::init();
+
 $lastCleanup = Setting::get('trash_cleanup_last_run', '');
 $today = date('Y-m-d');
 if ($lastCleanup !== $today) {
@@ -300,6 +303,7 @@ Router::post('/api/trash/cleanup', function() {
     (new FileController())->cleanupTrash();
 }, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
 
+/* ---------- v1.0.5：多语言 / 文件大小清晰化 / 移动端适配 ---------- */
 /* ---------- v1.0.4：个人中心 / 2FA / 星标 / 标签 / 离线下载 ---------- */
 
 Router::get('/profile', function() {
@@ -358,6 +362,7 @@ Router::post('/api/offline/create', function() {
     (new FileController())->offlineCreate();
 }, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
 
+/* ---------- v1.0.5：多语言 / 文件大小清晰化 / 移动端适配 ---------- */
 /* ---------- v1.0.4：开放 API v1（Bearer Token，无 CSRF） ---------- */
 
 Router::get('/api/v1/quota', function() {

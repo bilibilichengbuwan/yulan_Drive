@@ -600,7 +600,7 @@ select.form-control { padding-right: 32px; cursor: pointer; }
 .file-table .file-name:hover { color: var(--primary); }
 .file-table .file-name i { font-size: 18px; width: 22px; text-align: center; color: var(--text-2); flex: 0 0 auto; }
 .file-table .file-name .folder-icon { color: var(--warn); }
-.file-table .file-size { font-size: 13px; color: var(--text-2); white-space: nowrap; }
+.file-table .file-size { font-size: 13px; color: var(--text-3); white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; letter-spacing: .2px; }
 .file-table .file-time { font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
 .file-actions { display: flex; gap: 4px; justify-content: flex-end; }
 
@@ -742,15 +742,15 @@ input[type="checkbox"] {
 .fc-thumb .folder-icon { color: var(--warn); }
 .fc-name {
   padding: 10px 12px 2px; font-size: 13px; font-weight: 500; color: var(--text);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; word-break: break-word;
 }
-.fc-meta { padding: 0 12px 10px; font-size: 11.5px; color: var(--text-2); }
+.fc-meta { padding: 2px 12px 10px; font-size: 11.5px; color: var(--text-2); display: flex; align-items: center; gap: 5px; word-break: break-word; }
 .fc-actions { display: flex; gap: 2px; justify-content: center; padding: 0 8px 10px; flex-wrap: wrap; }
 
 /* ---- 文件管理器：列表缩略图与截断 ---- */
 
 .file-thumb { width: 28px; height: 28px; object-fit: cover; border-radius: 6px; flex: 0 0 auto; }
-.fname-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.fname-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1 1 auto; }
 .me-1 { margin-right: 4px; }
 
 /* ---- 统计卡片（后台仪表盘）---- */
@@ -906,8 +906,8 @@ body.auth-body {
   .file-table td:nth-child(3) { grid-area: size; }
   .file-table td:nth-child(4) { grid-area: time; }
   .file-table td:nth-child(5) { grid-area: actions; }
-  .file-table .file-name { font-size: 14px; }
-  .file-table .file-size, .file-table .file-time { font-size: 12px; color: var(--text-3); }
+.file-table .file-name { font-size: 14px; }
+.file-table .file-size, .file-table .file-time { font-size: 12px; color: var(--text-3); text-align: left; }
   .file-table tbody tr:hover { background: transparent; }
   .file-actions { gap: 2px; }
 
@@ -1051,4 +1051,45 @@ body.auth-body {
   background: var(--primary); color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; font-weight: 600; flex-shrink: 0;
+}
+
+/* ===================== 文件列表：大小列右对齐（与文件名清晰分离） ===================== */
+.file-table th:nth-child(3) { text-align: right; }
+
+/* ===================== 移动端 / 长文本自适应 ===================== */
+/* 防止媒体、表格、代码块、输入框撑破视口导致整页横向滚动 */
+img, video, table, pre, textarea, iframe, .modal-box, .modal { max-width: 100%; }
+/* 长文本（文件名 / 分享链接 / 路径 / 日志 / JSON 等）在窄屏正常换行 */
+.filename, .file-name, .fname-text, .fc-name,
+.share-link, .path,
+.kv-row .v, .log-line, .activity-item .ai-title,
+pre, code, .alert, .modal-box .m-body, .auth-head .lead, .hero-text .lead {
+  overflow-wrap: anywhere; word-break: break-word;
+}
+/* 只读长字符串（分享链接等）允许断行 */
+.share-link, #shareLink { word-break: break-all; }
+/* 弹窗内表单控件在 flex 上下文不溢出 */
+.modal-box .m-body .form-control, .modal .modal-body .form-control { min-width: 0; }
+
+/* ===================== 页脚语言切换器（固定浮动） ===================== */
+.lang-switch {
+  position: fixed; left: 14px; bottom: 14px; z-index: 1500;
+  display: inline-flex; align-items: center; gap: 3px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--r-pill); box-shadow: var(--shadow-pop);
+  padding: 4px 6px;
+}
+.lang-switch .lang-label { color: var(--text-3); display: inline-flex; align-items: center; padding: 0 4px 0 2px; font-size: 13px; }
+.lang-switch .lang-opt {
+  color: var(--text-2); text-decoration: none; padding: 4px 10px;
+  border-radius: var(--r-pill); font-size: 12.5px; white-space: nowrap;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.lang-switch .lang-opt:hover { background: var(--line-soft); color: var(--text); }
+.lang-switch .lang-opt.active { background: var(--primary); color: #fff; font-weight: 500; }
+
+@media (max-width: 480px) {
+  .lang-switch { left: 8px; bottom: 8px; padding: 3px 4px; }
+  .lang-switch .lang-opt { padding: 3px 8px; font-size: 12px; }
+  .lang-switch .lang-label { display: none; }
 }

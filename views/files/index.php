@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#f5f6f8">
     <meta name="csrf-token" content="<?= Middleware::generateCsrfToken() ?>">
-    <title>我的文件 - <?= Helper::e($brand) ?></title>
+    <title><?= lang('我的文件 - ') ?><?= Helper::e($brand) ?></title>
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/theme.js"></script>
@@ -15,28 +15,28 @@
 
     <nav class="topnav">
         <div class="topnav-inner">
-            <button class="icon-btn hamburger" onclick="openSide()" aria-label="打开导航菜单" title="菜单"><i class="fas fa-bars"></i></button>
+            <button class="icon-btn hamburger" onclick="openSide()" aria-label="<?= lang('打开导航菜单') ?>" title="<?= lang('菜单') ?>"><i class="fas fa-bars"></i></button>
             <a class="brand" href="/"><span class="logo"><i class="fas fa-cloud"></i></span><span><?= Helper::e($brand) ?></span></a>
             <form class="nav-search" action="/search" method="GET" role="search">
                 <i class="fas fa-search"></i>
-                <input type="text" name="keyword" placeholder="搜索全部文件..." value="<?= Helper::e($search ?? '') ?>" aria-label="搜索文件">
+                <input type="text" name="keyword" placeholder="<?= lang('搜索全部文件...') ?>" value="<?= Helper::e($search ?? '') ?>" aria-label="<?= lang('搜索文件') ?>">
             </form>
             <div class="spacer"></div>
-            <button class="theme-toggle" title="切换深色 / 浅色"><i class="fas fa-moon"></i></button>
+            <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
             <div class="user-menu">
-                <button class="avatar-btn" onclick="toggleDropdown(event)" aria-label="用户菜单">
+                <button class="avatar-btn" onclick="toggleDropdown(event)" aria-label="<?= lang('用户菜单') ?>">
                     <span class="username"><?= Helper::e(Session::getUsername()) ?></span>
                     <span class="avatar"><?= mb_substr(Session::getUsername(), 0, 1) ?></span>
                 </button>
                 <div class="dropdown-menu" id="userDropdown">
-                    <a href="/profile"><i class="fas fa-user"></i>个人中心</a>
-                    <a href="/starred"><i class="fas fa-star"></i>星标</a>
-                    <a href="/offline"><i class="fas fa-cloud-arrow-down"></i>离线下载</a>
-                    <a href="/trash"><i class="fas fa-trash-can"></i>回收站</a>
-                    <a href="/share/my"><i class="fas fa-share-nodes"></i>我的分享</a>
-                    <?php if (Session::isAdmin()): ?><a href="/admin"><i class="fas fa-cog"></i>管理后台</a><?php endif; ?>
+                    <a href="/profile"><i class="fas fa-user"></i><?= lang('个人中心') ?></a>
+                    <a href="/starred"><i class="fas fa-star"></i><?= lang('星标') ?></a>
+                    <a href="/offline"><i class="fas fa-cloud-arrow-down"></i><?= lang('离线下载') ?></a>
+                    <a href="/trash"><i class="fas fa-trash-can"></i><?= lang('回收站') ?></a>
+                    <a href="/share/my"><i class="fas fa-share-nodes"></i><?= lang('我的分享') ?></a>
+                    <?php if (Session::isAdmin()): ?><a href="/admin"><i class="fas fa-cog"></i><?= lang('管理后台') ?></a><?php endif; ?>
                     <div class="divider"></div>
-                    <a href="/logout"><i class="fas fa-arrow-right-from-bracket"></i>退出登录</a>
+                    <a href="/logout"><i class="fas fa-arrow-right-from-bracket"></i><?= lang('退出登录') ?></a>
                 </div>
             </div>
         </div>
@@ -45,47 +45,47 @@
 <div class="app-wrapper">
 
     <div class="sidebar" id="sidebar">
-        <div class="menu-label">文件</div>
+        <div class="menu-label"><?= lang('文件') ?></div>
         <a href="/files?folder=0" class="menu-item active">
-            <i class="fas fa-folder-open"></i><span>全部文件</span>
+            <i class="fas fa-folder-open"></i><span><?= lang('全部文件') ?></span>
         </a>
         <a href="/files?folder=0&sort=created_at DESC" class="menu-item">
-            <i class="fas fa-clock"></i><span>最近上传</span>
+            <i class="fas fa-clock"></i><span><?= lang('最近上传') ?></span>
         </a>
-        <div class="menu-label">操作</div>
+        <div class="menu-label"><?= lang('操作') ?></div>
         <button class="btn-action" onclick="showCreateFolder()">
-            <i class="fas fa-folder-plus"></i><span>新建文件夹</span>
+            <i class="fas fa-folder-plus"></i><span><?= lang('新建文件夹') ?></span>
         </button>
         <button class="btn-action" onclick="document.getElementById('fileInput').click()">
-            <i class="fas fa-upload"></i><span>上传文件</span>
+            <i class="fas fa-upload"></i><span><?= lang('上传文件') ?></span>
         </button>
         <button class="btn-action" onclick="showChunkUpload()">
-            <i class="fas fa-file-archive"></i><span>大文件上传</span>
+            <i class="fas fa-file-archive"></i><span><?= lang('大文件上传') ?></span>
         </button>
         <input type="file" id="fileInput" multiple style="display:none" onchange="uploadFilesWithProgress(this.files); this.value='';">
         <div class="sidebar-divider"></div>
-        <div class="menu-label">位置</div>
+        <div class="menu-label"><?= lang('位置') ?></div>
         <a href="/starred" class="menu-item">
-            <i class="fas fa-star"></i><span>星标</span>
+            <i class="fas fa-star"></i><span><?= lang('星标') ?></span>
         </a>
         <a href="/offline" class="menu-item">
-            <i class="fas fa-cloud-arrow-down"></i><span>离线下载</span>
+            <i class="fas fa-cloud-arrow-down"></i><span><?= lang('离线下载') ?></span>
         </a>
         <a href="/trash" class="menu-item">
-            <i class="fas fa-trash"></i><span>回收站</span>
+            <i class="fas fa-trash"></i><span><?= lang('回收站') ?></span>
         </a>
         <a href="/share/my" class="menu-item">
-            <i class="fas fa-share-alt"></i><span>我的分享</span>
+            <i class="fas fa-share-alt"></i><span><?= lang('我的分享') ?></span>
         </a>
         <div class="sidebar-divider"></div>
         <a href="/profile" class="menu-item">
-            <i class="fas fa-user"></i><span>个人中心</span>
+            <i class="fas fa-user"></i><span><?= lang('个人中心') ?></span>
         </a>
         <a href="/logout" class="menu-item">
-            <i class="fas fa-sign-out-alt"></i><span>退出登录</span>
+            <i class="fas fa-sign-out-alt"></i><span><?= lang('退出登录') ?></span>
         </a>
         <div class="storage-wrap">
-            <div class="label">存储空间</div>
+            <div class="label"><?= lang('存储空间') ?></div>
             <div class="storage-bar">
                 <?php $percent = $storage_total > 0 ? ($storage_used / $storage_total * 100) : 0; ?>
                 <span style="width:<?= $percent ?>%"></span>
@@ -98,16 +98,16 @@
     <div class="main-content" id="mainContent">
         <div class="drag-overlay" id="dragOverlay">
             <i class="fas fa-cloud-upload-alt"></i>
-            <span>松手即可上传</span>
+            <span><?= lang('松手即可上传') ?></span>
         </div>
 
         <div class="toolbar">
             <div class="breadcrumb">
                 <?php if ($parent_id > 0 && count($breadcrumbs) > 1): ?>
-                    <a href="/files?folder=<?= $breadcrumbs[1]['id'] ?>"><i class="fas fa-arrow-left"></i> 返回</a>
+                    <a href="/files?folder=<?= $breadcrumbs[1]['id'] ?>"><i class="fas fa-arrow-left"></i><?= lang(' 返回') ?></a>
                     <span class="sep">/</span>
                 <?php elseif ($parent_id > 0 && count($breadcrumbs) == 1): ?>
-                    <a href="/files"><i class="fas fa-arrow-left"></i> 返回</a>
+                    <a href="/files"><i class="fas fa-arrow-left"></i><?= lang(' 返回') ?></a>
                     <span class="sep">/</span>
                 <?php endif; ?>
                 <?php foreach ($breadcrumbs as $index => $crumb): ?>
@@ -120,29 +120,29 @@
                 <?php endforeach; ?>
             </div>
             <div class="actions">
-                <select class="sort-select" onchange="location.href='/files?folder=<?= $parent_id ?>&sort='+this.value" aria-label="排序方式">
-                    <option value="type ASC, name ASC" <?= $sort == 'type ASC, name ASC' ? 'selected' : '' ?>>按类型</option>
-                    <option value="name ASC" <?= $sort == 'name ASC' ? 'selected' : '' ?>>按名称</option>
-                    <option value="size DESC" <?= $sort == 'size DESC' ? 'selected' : '' ?>>按大小</option>
-                    <option value="created_at DESC" <?= $sort == 'created_at DESC' ? 'selected' : '' ?>>按时间</option>
+                <select class="sort-select" onchange="location.href='/files?folder=<?= $parent_id ?>&sort='+this.value" aria-label="<?= lang('排序方式') ?>">
+                    <option value="type ASC, name ASC" <?= $sort == 'type ASC, name ASC' ? 'selected' : '' ?>><?= lang('按类型') ?></option>
+                    <option value="name ASC" <?= $sort == 'name ASC' ? 'selected' : '' ?>><?= lang('按名称') ?></option>
+                    <option value="size DESC" <?= $sort == 'size DESC' ? 'selected' : '' ?>><?= lang('按大小') ?></option>
+                    <option value="created_at DESC" <?= $sort == 'created_at DESC' ? 'selected' : '' ?>><?= lang('按时间') ?></option>
                 </select>
-                <button class="btn" onclick="showCreateFolder()">
-                    <i class="fas fa-folder-plus"></i><span> 新建</span>
-                </button>
-                <button class="btn" id="viewToggle" onclick="toggleView()" title="切换视图">
-                    <i class="fas fa-th-large"></i><span> 网格</span>
-                </button>
-                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
-                    <i class="fas fa-upload"></i> 上传
-                </button>
+        <button class="btn" onclick="showCreateFolder()">
+            <i class="fas fa-folder-plus"></i><span> <?= lang('新建') ?></span>
+        </button>
+        <button class="btn" id="viewToggle" onclick="toggleView()" title="<?= lang('切换视图') ?>">
+            <i class="fas fa-th-large"></i><span> <?= lang('网格') ?></span>
+        </button>
+        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-upload"></i> <?= lang('上传') ?>
+        </button>
             </div>
         </div>
 
         <div id="batch-actions">
-            <span class="selected-count" id="selected-count">已选 0 项</span>
-            <button class="batch-btn" onclick="batchDownload()"><i class="fas fa-download me-1"></i>打包下载</button>
-            <button class="batch-btn danger" onclick="batchDelete()"><i class="fas fa-trash me-1"></i>删除</button>
-            <button class="batch-btn" onclick="showBatchMove()"><i class="fas fa-arrows-alt me-1"></i>移动</button>
+            <span class="selected-count" id="selected-count"><?= lang('已选 0 项') ?></span>
+            <button class="batch-btn" onclick="batchDownload()"><i class="fas fa-download me-1"></i><?= lang('打包下载') ?></button>
+            <button class="batch-btn danger" onclick="batchDelete()"><i class="fas fa-trash me-1"></i><?= lang('删除') ?></button>
+            <button class="batch-btn" onclick="showBatchMove()"><i class="fas fa-arrows-alt me-1"></i><?= lang('移动') ?></button>
         </div>
 
         <div class="file-table" id="listView">
@@ -150,10 +150,10 @@
                 <thead>
                     <tr>
                         <th width="30"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
-                        <th>名称</th>
-                        <th width="100">大小</th>
-                        <th width="120">时间</th>
-                        <th width="140">操作</th>
+                        <th><?= lang('名称') ?></th>
+                        <th width="100"><?= lang('大小') ?></th>
+                        <th width="120"><?= lang('时间') ?></th>
+                        <th width="140"><?= lang('操作') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -162,7 +162,7 @@
                             <td colspan="5">
                                 <div class="empty-state">
                                     <i class="fas fa-folder-open"></i>
-                                    <p>这里空空的，上传点文件吧</p>
+                                    <p><?= lang('这里空空的，上传点文件吧') ?></p>
                                 </div>
                             </td>
                         </tr>
@@ -195,14 +195,14 @@
                                 <td class="file-time"><?= date('m-d H:i', strtotime($file['created_at'])) ?></td>
                                 <td>
                                     <div class="file-actions">
-                                        <button class="btn-sm star <?= !empty($file['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= $file['id'] ?>, this)" title="星标"><i class="<?= !empty($file['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
+                                        <button class="btn-sm star <?= !empty($file['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= $file['id'] ?>, this)" title="<?= lang('星标') ?>"><i class="<?= !empty($file['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
                                         <?php if ($file['type'] == 'file'): ?>
-                                            <button class="btn-sm" onclick="downloadFile(<?= $file['id'] ?>)" title="下载"><i class="fas fa-download"></i></button>
+                                            <button class="btn-sm" onclick="downloadFile(<?= $file['id'] ?>)" title="<?= lang('下载') ?>"><i class="fas fa-download"></i></button>
                                         <?php endif; ?>
-                                        <button class="btn-sm primary" onclick="showShare(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="分享"><i class="fas fa-share"></i></button>
-                                        <button class="btn-sm" onclick="showRename(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="重命名"><i class="fas fa-pen"></i></button>
-                                        <button class="btn-sm" onclick="editTags(<?= $file['id'] ?>, '<?= Helper::e($file['tags'] ?? '') ?>')" title="标签"><i class="fas fa-tag"></i></button>
-                                        <button class="btn-sm danger" onclick="deleteItem(<?= $file['id'] ?>)" title="删除"><i class="fas fa-trash"></i></button>
+                                        <button class="btn-sm primary" onclick="showShare(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="<?= lang('分享') ?>"><i class="fas fa-share"></i></button>
+                                        <button class="btn-sm" onclick="showRename(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="<?= lang('重命名') ?>"><i class="fas fa-pen"></i></button>
+                                        <button class="btn-sm" onclick="editTags(<?= $file['id'] ?>, '<?= Helper::e($file['tags'] ?? '') ?>')" title="<?= lang('标签') ?>"><i class="fas fa-tag"></i></button>
+                                        <button class="btn-sm danger" onclick="deleteItem(<?= $file['id'] ?>)" title="<?= lang('删除') ?>"><i class="fas fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -214,7 +214,7 @@
 
         <div class="file-grid" id="gridView" style="display:none">
             <?php if (empty($files)): ?>
-                <div class="empty-state"><i class="fas fa-folder-open"></i><p>这里空空的，上传点文件吧</p></div>
+                <div class="empty-state"><i class="fas fa-folder-open"></i><p><?= lang('这里空空的，上传点文件吧') ?></p></div>
             <?php else: ?>
                 <?php foreach ($files as $file): ?>
                     <div class="file-card" data-id="<?= $file['id'] ?>" data-type="<?= $file['type'] ?>" <?= $file['type'] == 'file' ? 'draggable="true"' : '' ?>>
@@ -228,13 +228,13 @@
                             <?php endif; ?>
                         </div>
                         <div class="fc-name" title="<?= Helper::e($file['name']) ?>"><?= Helper::e($file['name']) ?></div>
-                        <div class="fc-meta"><?= $file['type'] == 'file' ? Helper::formatSize($file['size']) : '文件夹' ?></div>
+                        <div class="fc-meta"><?= $file['type'] == 'file' ? Helper::formatSize($file['size']) : lang('文件夹') ?></div>
                         <div class="fc-actions">
-                            <button class="btn-sm star <?= !empty($file['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= $file['id'] ?>, this)" title="星标"><i class="<?= !empty($file['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
-                            <?php if ($file['type'] == 'file'): ?><button class="btn-sm" onclick="downloadFile(<?= $file['id'] ?>)" title="下载"><i class="fas fa-download"></i></button><?php endif; ?>
-                            <button class="btn-sm primary" onclick="showShare(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="分享"><i class="fas fa-share"></i></button>
-                            <button class="btn-sm" onclick="showRename(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="重命名"><i class="fas fa-pen"></i></button>
-                            <button class="btn-sm danger" onclick="deleteItem(<?= $file['id'] ?>)" title="删除"><i class="fas fa-trash"></i></button>
+                            <button class="btn-sm star <?= !empty($file['starred']) ? 'on' : '' ?>" onclick="toggleStar(<?= $file['id'] ?>, this)" title="<?= lang('星标') ?>"><i class="<?= !empty($file['starred']) ? 'fas' : 'far' ?> fa-star"></i></button>
+                            <?php if ($file['type'] == 'file'): ?><button class="btn-sm" onclick="downloadFile(<?= $file['id'] ?>)" title="<?= lang('下载') ?>"><i class="fas fa-download"></i></button><?php endif; ?>
+                            <button class="btn-sm primary" onclick="showShare(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="<?= lang('分享') ?>"><i class="fas fa-share"></i></button>
+                            <button class="btn-sm" onclick="showRename(<?= $file['id'] ?>, '<?= Helper::e($file['name']) ?>')" title="<?= lang('重命名') ?>"><i class="fas fa-pen"></i></button>
+                            <button class="btn-sm danger" onclick="deleteItem(<?= $file['id'] ?>)" title="<?= lang('删除') ?>"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -255,15 +255,15 @@
 <div class="modal-overlay" id="createFolderModal">
     <div class="modal-box sm">
         <div class="m-header">
-            <h6>新建文件夹</h6>
+            <h6><?= lang('新建文件夹') ?></h6>
             <button class="close-btn" onclick="closeModal('createFolderModal')">&times;</button>
         </div>
         <div class="m-body">
-            <input type="text" class="form-control" id="folderName" placeholder="文件夹名称" autofocus>
+            <input type="text" class="form-control" id="folderName" placeholder="<?= lang('文件夹名称') ?>" autofocus>
         </div>
         <div class="m-footer">
-            <button class="btn btn-outline" onclick="closeModal('createFolderModal')">取消</button>
-            <button class="btn btn-primary" onclick="createFolder()">创建</button>
+            <button class="btn btn-outline" onclick="closeModal('createFolderModal')"><?= lang('取消') ?></button>
+            <button class="btn btn-primary" onclick="createFolder()"><?= lang('创建') ?></button>
         </div>
     </div>
 </div>
@@ -271,7 +271,7 @@
 <div class="modal-overlay" id="renameModal">
     <div class="modal-box sm">
         <div class="m-header">
-            <h6>重命名</h6>
+            <h6><?= lang('重命名') ?></h6>
             <button class="close-btn" onclick="closeModal('renameModal')">&times;</button>
         </div>
         <div class="m-body">
@@ -279,8 +279,8 @@
             <input type="text" class="form-control" id="renameName">
         </div>
         <div class="m-footer">
-            <button class="btn btn-outline" onclick="closeModal('renameModal')">取消</button>
-            <button class="btn btn-primary" onclick="renameItem()">确定</button>
+            <button class="btn btn-outline" onclick="closeModal('renameModal')"><?= lang('取消') ?></button>
+            <button class="btn btn-primary" onclick="renameItem()"><?= lang('确定') ?></button>
         </div>
     </div>
 </div>
@@ -288,33 +288,33 @@
 <div class="modal-overlay" id="shareModal">
     <div class="modal-box">
         <div class="m-header">
-            <h6>分享文件</h6>
+            <h6><?= lang('分享文件') ?></h6>
             <button class="close-btn" onclick="closeModal('shareModal')">&times;</button>
         </div>
         <div class="m-body">
             <input type="hidden" id="shareFileId">
             <p style="font-size:14px;color:var(--text-secondary);margin:0 0 16px;" id="shareFileName"></p>
             <div style="margin-bottom:12px;">
-                <div class="form-label">访问密码（可选）</div>
+                <div class="form-label"><?= lang('访问密码（可选）') ?></div>
                 <input type="text" class="form-control" id="sharePassword">
             </div>
             <div style="margin-bottom:12px;">
-                <div class="form-label">有效期</div>
+                <div class="form-label"><?= lang('有效期') ?></div>
                 <select class="form-select" id="shareExpire">
-                    <option value="0">永久</option>
-                    <option value="1">1天</option>
-                    <option value="7" selected>7天</option>
-                    <option value="30">30天</option>
+                    <option value="0"><?= lang('永久') ?></option>
+                    <option value="1"><?= lang('1天') ?></option>
+                    <option value="7" selected><?= lang('7天') ?></option>
+                    <option value="30"><?= lang('30天') ?></option>
                 </select>
             </div>
             <div>
-                <div class="form-label">下载次数限制（0为不限）</div>
+                <div class="form-label"><?= lang('下载次数限制（0为不限）') ?></div>
                 <input type="number" class="form-control" id="shareMaxDownloads" value="0">
             </div>
         </div>
         <div class="m-footer">
-            <button class="btn btn-outline" onclick="closeModal('shareModal')">取消</button>
-            <button class="btn btn-primary" onclick="createShare()">创建</button>
+            <button class="btn btn-outline" onclick="closeModal('shareModal')"><?= lang('取消') ?></button>
+            <button class="btn btn-primary" onclick="createShare()"><?= lang('创建') ?></button>
         </div>
     </div>
 </div>
@@ -322,13 +322,13 @@
 <div class="modal-overlay" id="shareResultModal">
     <div class="modal-box">
         <div class="m-header">
-            <h6>分享链接</h6>
+            <h6><?= lang('分享链接') ?></h6>
             <button class="close-btn" onclick="closeModal('shareResultModal')">&times;</button>
         </div>
         <div class="m-body">
             <div style="display:flex;">
                 <input type="text" class="form-control" id="shareLink" readonly style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);font-size:13px;">
-                <button class="btn btn-primary" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 18px;" onclick="copyShareLink()">复制</button>
+                <button class="btn btn-primary" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 18px;" onclick="copyShareLink()"><?= lang('复制') ?></button>
             </div>
         </div>
     </div>
@@ -337,17 +337,17 @@
 <div class="modal-overlay" id="moveModal">
     <div class="modal-box">
         <div class="m-header">
-            <h6>移动到</h6>
+            <h6><?= lang('移动到') ?></h6>
             <button class="close-btn" onclick="closeModal('moveModal')">&times;</button>
         </div>
         <div class="m-body">
             <div id="folderTree" style="font-size:13px;color:var(--text-secondary);">
-                <div style="padding:6px 0;"><i class="fas fa-folder" style="color:#f5b342;"></i> 全部文件</div>
+                <div style="padding:6px 0;"><i class="fas fa-folder" style="color:#f5b342;"></i><?= lang(' 全部文件') ?></div>
             </div>
         </div>
         <div class="m-footer">
-            <button class="btn btn-outline" onclick="closeModal('moveModal')">取消</button>
-            <button class="btn btn-primary" onclick="moveItems()">移动</button>
+            <button class="btn btn-outline" onclick="closeModal('moveModal')"><?= lang('取消') ?></button>
+            <button class="btn btn-primary" onclick="moveItems()"><?= lang('移动') ?></button>
         </div>
     </div>
 </div>
@@ -355,7 +355,7 @@
 <div class="modal-overlay" id="chunkUploadModal">
     <div class="modal-box">
         <div class="m-header">
-            <h6>大文件上传</h6>
+            <h6><?= lang('大文件上传') ?></h6>
             <button class="close-btn" onclick="closeModal('chunkUploadModal')">&times;</button>
         </div>
         <div class="m-body">
@@ -366,8 +366,8 @@
             <div id="chunkStatus" class="mt-2" style="font-size:13px;color:var(--text-light);"></div>
         </div>
         <div class="m-footer">
-            <button class="btn btn-outline" onclick="closeModal('chunkUploadModal')">关闭</button>
-            <button class="btn btn-primary" onclick="startChunkUpload()">上传</button>
+            <button class="btn btn-outline" onclick="closeModal('chunkUploadModal')"><?= lang('关闭') ?></button>
+            <button class="btn btn-primary" onclick="startChunkUpload()"><?= lang('上传') ?></button>
         </div>
     </div>
 </div>
@@ -376,7 +376,7 @@
 <div class="modal-overlay" id="profileModal">
     <div class="modal-box" style="width:440px;max-width:92vw;">
         <div class="m-header">
-            <h6>个人中心</h6>
+            <h6><?= lang('个人中心') ?></h6>
             <button class="close-btn" onclick="closeProfileModal()">&times;</button>
         </div>
         <div class="m-body">
@@ -389,30 +389,30 @@
             </div>
 
             <div style="margin-bottom:20px;">
-                <div class="form-label">用户名</div>
+                <div class="form-label"><?= lang('用户名') ?></div>
                 <div style="display:flex;gap:8px;">
                     <input type="text" id="newUsername" value="<?= Helper::e(Session::getUsername()) ?>" class="form-control" style="flex:1;">
-                    <button class="btn btn-primary" onclick="updateUsername()" style="padding:8px 18px;">保存</button>
+                    <button class="btn btn-primary" onclick="updateUsername()" style="padding:8px 18px;"><?= lang('保存') ?></button>
                 </div>
             </div>
 
             <div style="margin-bottom:20px;">
-                <div class="form-label">邮箱</div>
+                <div class="form-label"><?= lang('邮箱') ?></div>
                 <input type="text" value="<?= Helper::e(Session::getEmail()) ?>" disabled class="form-control" style="background:var(--bg);color:var(--text-light);">
             </div>
 
             <div style="margin-bottom:20px;">
-                <div class="form-label">修改密码</div>
-                <input type="password" id="oldPassword" placeholder="当前密码" class="form-control" style="margin-bottom:8px;">
-                <input type="password" id="newPassword" placeholder="新密码（至少6位）" class="form-control" style="margin-bottom:8px;">
+                <div class="form-label"><?= lang('修改密码') ?></div>
+                <input type="password" id="oldPassword" placeholder="<?= lang('当前密码') ?>" class="form-control" style="margin-bottom:8px;">
+                <input type="password" id="newPassword" placeholder="<?= lang('新密码（至少6位）') ?>" class="form-control" style="margin-bottom:8px;">
                 <div style="display:flex;gap:8px;">
-                    <input type="password" id="confirmPassword" placeholder="确认新密码" class="form-control" style="flex:1;">
-                    <button class="btn btn-primary" onclick="changePassword()" style="padding:8px 18px;white-space:nowrap;">修改密码</button>
+                    <input type="password" id="confirmPassword" placeholder="<?= lang('确认新密码') ?>" class="form-control" style="flex:1;">
+                    <button class="btn btn-primary" onclick="changePassword()" style="padding:8px 18px;white-space:nowrap;"><?= lang('修改密码') ?></button>
                 </div>
             </div>
 
             <div style="padding-top:16px;border-top:1px solid var(--line);">
-                <button class="btn btn-danger-outline btn-block" onclick="deleteAccount()"><i class="fas fa-triangle-exclamation"></i>注销账号</button>
+                <button class="btn btn-danger-outline btn-block" onclick="deleteAccount()"><i class="fas fa-triangle-exclamation"></i><?= lang('注销账号') ?></button>
             </div>
         </div>
     </div>
@@ -420,9 +420,9 @@
 
 <!-- 上传进度提示 -->
 <div class="upload-progress" id="uploadProgress">
-    <div class="title"><i class="fas fa-upload me-1"></i>正在上传</div>
-    <div class="file-list" id="uploadFileList"></div>
-    <div class="overall" id="uploadOverall">0 / 0 个文件</div>
+            <div class="title"><i class="fas fa-upload me-1"></i><?= lang('正在上传') ?></div>
+            <div class="file-list" id="uploadFileList"></div>
+            <div class="overall" id="uploadOverall"><?= lang('0 / 0 个文件') ?></div>
 </div>
 
 <script src="/js/app.js"></script>
@@ -491,7 +491,7 @@ function getCsrfToken() {
                 }
             }
             if (hasFolder && files.length === 0) {
-                alert('不支持上传文件夹，请选择文件');
+                alert('<?= lang('不支持上传文件夹，请选择文件') ?>');
                 return;
             }
             if (files.length > 0) {
@@ -520,14 +520,14 @@ function getCsrfToken() {
         const overall = progressDiv.querySelector('.overall');
         progressDiv.classList.add('show');
         fileList.innerHTML = '';
-        overall.textContent = '0 / ' + files.length + ' 个文件';
+        overall.textContent = '0 / ' + files.length + ' <?= lang('个文件') ?>';
 
         let completed = 0;
         let errors = 0;
 
         function uploadNext(index) {
             if (index >= files.length) {
-                overall.textContent = '上传完成' + (errors > 0 ? '（' + errors + '个失败）' : '');
+                overall.textContent = '<?= lang('上传完成') ?>' + (errors > 0 ? '（' + errors + '<?= lang('个失败') ?>' + '）' : '');
                 setTimeout(function() { progressDiv.classList.remove('show'); location.reload(); }, 1500);
                 return;
             }
@@ -535,7 +535,7 @@ function getCsrfToken() {
             const file = files[index];
             const item = document.createElement('div');
             item.className = 'file-item';
-            item.innerHTML = '<span class="name">' + file.name + '</span><span class="status">上传中...</span>';
+            item.innerHTML = '<span class="name">' + file.name + '</span><span class="status">' + __('上传中...') + '</span>';
             fileList.appendChild(item);
 
             const formData = new FormData();
@@ -563,7 +563,7 @@ function getCsrfToken() {
                     item.querySelector('.status').className = 'status error';
                     errors++;
                 }
-                overall.textContent = completed + ' / ' + files.length + ' 个文件';
+                overall.textContent = completed + ' / ' + files.length + ' <?= lang('个文件') ?>';
                 uploadNext(index + 1);
             })
             .catch(function() {
@@ -571,7 +571,7 @@ function getCsrfToken() {
                 errors++;
                 item.querySelector('.status').textContent = '失败';
                 item.querySelector('.status').className = 'status error';
-                overall.textContent = completed + ' / ' + files.length + ' 个文件';
+                overall.textContent = completed + ' / ' + files.length + ' <?= lang('个文件') ?>';
                 uploadNext(index + 1);
             });
         }
@@ -602,7 +602,7 @@ function startChunkUpload() {
     var status = document.getElementById('chunkStatus');
     progress.style.display = 'block';
     progress.querySelector('div').style.width = '0%';
-    status.textContent = '准备上传... 0%';
+    status.textContent = '<?= lang('准备上传... 0%') ?>';
 
     var chunkSize = 2 * 1024 * 1024; // 2MB 一片
     var totalChunks = Math.ceil(file.size / chunkSize);
@@ -611,7 +611,7 @@ function startChunkUpload() {
 
     function uploadChunk() {
         if (currentChunk >= totalChunks) {
-            status.textContent = '上传完成！';
+            status.textContent = '<?= lang('上传完成！') ?>';
             progress.querySelector('div').style.width = '100%';
             setTimeout(function() { 
                 closeModal('chunkUploadModal');
@@ -649,15 +649,15 @@ function startChunkUpload() {
             currentChunk++;
             var pct = Math.round((currentChunk / totalChunks) * 100);
             progress.querySelector('div').style.width = pct + '%';
-            status.textContent = '上传中... ' + pct + '%';
+            status.textContent = '<?= lang('上传中...') ?> ' + pct + '%';
             if (json.code !== 0) {
-                status.textContent = '上传失败: ' + (json.message || '未知错误');
+                status.textContent = '<?= lang('上传失败') ?>: ' + (json.message || '<?= lang('未知错误') ?>');
                 return;
             }
             uploadChunk();
         })
         .catch(function() {
-            status.textContent = '上传失败，请重试';
+            status.textContent = '<?= lang('上传失败，请重试') ?>';
         });
     }
 
@@ -819,5 +819,6 @@ function batchDownload() {
 })();
 </script>
 
+<?= I18n::footer() ?>
 </body>
 </html>
