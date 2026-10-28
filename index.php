@@ -303,6 +303,7 @@ Router::post('/api/trash/cleanup', function() {
     (new FileController())->cleanupTrash();
 }, [[Middleware::class, 'auth'], [Middleware::class, 'csrf']]);
 
+/* ---------- v1.0.6：修复分享下载计数 / 前台品牌标语随后台设置 ---------- */
 /* ---------- v1.0.5：多语言 / 文件大小清晰化 / 移动端适配 ---------- */
 /* ---------- v1.0.4：个人中心 / 2FA / 星标 / 标签 / 离线下载 ---------- */
 

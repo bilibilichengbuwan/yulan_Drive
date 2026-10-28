@@ -45,4 +45,8 @@ class Setting extends Model {
     public static function getBrandName() {
         return self::get('brand_name', '欲蓝网盘');
     }
+
+    public static function getBrandSlogan() {
+        return self::get('brand_slogan', '干净的私人云盘');
+    }
 }

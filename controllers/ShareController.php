@@ -35,6 +35,8 @@ class ShareController extends Controller {
         }
         if ($maxDownloads > 0) {
             $options['max_downloads'] = $maxDownloads;
+        } else {
+            $options['max_downloads'] = 0;
         }
         
         $result = $this->shareModel->createShare(

@@ -447,7 +447,7 @@ class FileController extends Controller {
                     if ((int)$share['max_downloads'] > 0 && (int)$share['download_count'] >= (int)$share['max_downloads']) {
                         $db->rollBack(); $this->error('分享链接已达到最大下载次数');
                     }
-                    $db->execute("UPDATE shares SET download_count = download_count + 1 WHERE id = ? AND status = 1 AND (max_downloads = 0 OR download_count < max_downloads)", [(int)$share['id']]);
+                    $db->execute("UPDATE shares SET download_count = download_count + 1 WHERE id = ? AND status = 1 AND (max_downloads IS NULL OR max_downloads = 0 OR download_count < max_downloads)", [(int)$share['id']]);
                 }
                 $db->execute("UPDATE download_tokens SET used = 1 WHERE id = ? AND used = 0", [(int)$tokenRow['id']]);
                 $db->commit();

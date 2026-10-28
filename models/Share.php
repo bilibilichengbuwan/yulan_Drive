@@ -25,7 +25,9 @@ class Share extends Model {
         }
         
         if (!empty($options['max_downloads'])) {
-            $data['max_downloads'] = $options['max_downloads'];
+            $data['max_downloads'] = (int)$options['max_downloads'];
+        } else {
+            $data['max_downloads'] = 0;
         }
         
         $shareId = $this->create($data);
