@@ -501,8 +501,15 @@ class FileController extends Controller {
         if (!$file || (int)$file['user_id'] !== (int)Session::getUserId() || (int)$file['is_deleted'] === 1 || $file['type'] !== 'file') $this->error('文件不存在或无权访问', 404);
         if (!Storage::exists($file['path'])) $this->error('文件不存在', 404);
         $mime = Helper::getMimeType($file['name']);
-        $safeInline = ['image/jpeg','image/png','image/gif','image/bmp','image/webp','video/mp4','video/webm','video/quicktime','audio/mpeg','audio/ogg','audio/wav','audio/flac','application/pdf','text/plain','application/json'];
-        if (!in_array($mime, $safeInline, true) && strpos($mime, 'text/') !== 0) $this->error('此文件不支持在线预览', 415);
+        // Inline preview is allowlist-only: no generic text/* fallback, so
+        // text/html, text/css and other executable text types are never
+        // served inline on this origin (previously any text/* was allowed).
+        $safeInline = ['image/jpeg','image/png','image/gif','image/bmp','image/webp','video/mp4','video/webm','video/quicktime','audio/mpeg','audio/ogg','audio/wav','audio/flac','application/pdf','text/plain','text/markdown','application/json'];
+        if (!in_array($mime, $safeInline, true)) $this->error('此文件不支持在线预览', 415);
+        // Defence in depth for the text types that are still served inline.
+        if (strpos($mime, 'text/') === 0 || $mime === 'application/json') {
+            header("Content-Security-Policy: default-src 'none'; sandbox");
+        }
         Storage::streamOutput($file['path'], $file['name'], $mime, 'inline');
     }
 

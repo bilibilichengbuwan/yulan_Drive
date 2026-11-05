@@ -43,7 +43,7 @@ class Helper {
             'doc' => 'application/msword', 'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'xls' => 'application/vnd.ms-excel', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'ppt' => 'application/vnd.ms-powerpoint', 'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'txt' => 'text/plain', 'html' => 'text/html', 'css' => 'text/css',
+            'txt' => 'text/plain', 'md' => 'text/markdown', 'markdown' => 'text/markdown', 'html' => 'text/html', 'css' => 'text/css',
             'js' => 'application/javascript', 'json' => 'application/json',
             'xml' => 'application/xml', 'zip' => 'application/zip',
             'rar' => 'application/x-rar-compressed', '7z' => 'application/x-7z-compressed',
