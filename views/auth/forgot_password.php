@@ -13,6 +13,7 @@
     <button class="theme-toggle" title="<?= lang('切换深色 / 浅色') ?>"><i class="fas fa-moon"></i></button>
     <div class="auth-card">
         <div class="auth-head">
+            <div class="auth-eyebrow"><?= Helper::e($brand) ?></div>
             <div class="brand-row">
                 <span class="logo"><i class="fas fa-cloud"></i></span>
                 <span class="bname"><?= Helper::e($brand) ?></span>
