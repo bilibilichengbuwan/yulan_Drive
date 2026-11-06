@@ -3,6 +3,11 @@
 class Installer {
     
     public static function check() {
+        // v1.0.8: a lock file written by a successful install means the
+        // system is installed, even if the users table check is unreachable.
+        if (file_exists(dirname(__DIR__) . '/installed.lock')) {
+            return true;
+        }
         $config = require dirname(__DIR__) . '/config/database.php';
         
         try {

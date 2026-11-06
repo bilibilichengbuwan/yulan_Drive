@@ -372,4 +372,7 @@ return [
     '（已删除）' => '(Deleted)',
     '（用户名 ' => '（用户名 ',
     '系统版本' => 'System Version',
+    '自己的网盘' => 'Your own drive',
+    '上传、分享、取回文件。支持文件夹分享、图片视频预览、大文件分片上传，存储可以接到自己的对象存储（S3 / OSS / COS / MinIO）。' => 'Upload, share, and retrieve files. Folder sharing, image and video previews, chunked large-file uploads, and storage backed by your own S3-compatible object storage (S3 / OSS / COS / MinIO).',
+    '新账号默认 10 GB 空间。文件保存在服务器上，密码加密存储，不接入任何第三方统计。' => 'New accounts get 10 GB by default. Files are stored on the server, passwords are stored encrypted, and no third-party tracking is used.',
 ];

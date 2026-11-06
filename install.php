@@ -1,7 +1,16 @@
 <?php
 
+// v1.0.8: never leak error details from the installer, and refuse to run
+// again once installed (lock file, or the users table already existing).
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
+if (file_exists(__DIR__ . '/installed.lock')) {
+    http_response_code(403);
+    echo "系统已安装。如需重新安装，请先删除 installed.lock 与 install.php。";
+    exit;
+}
 
 $config = require __DIR__ . '/config/database.php';
 
@@ -41,11 +50,9 @@ try {
     $db->exec("USE `{$config['dbname']}`");
     echo "<div class='alert alert-success'>数据库 {$config['dbname']} 已就绪</div>";
 
-    $tables = ['operation_logs', 'shares', 'upload_chunks', 'files', 'verify_codes', 'users', 'settings'];
-    foreach ($tables as $table) {
-        $db->exec("DROP TABLE IF EXISTS `{$table}`");
-    }
-    echo "<div class='alert alert-warning'>已清理旧数据</div>";
+    // v1.0.8: no DROP TABLE here. database.sql already uses
+    // CREATE TABLE IF NOT EXISTS, so reinstalling must not wipe data.
+    echo "<div class='alert alert-success'>数据表按需创建（已有表不会被清空）</div>";
 
     $sqlFile = __DIR__ . '/config/database.sql';
     $sql = file_get_contents($sqlFile);
@@ -95,7 +102,16 @@ try {
     echo "<li>用户名：<code>admin</code></li>";
     echo "<li>密码：<code>" . htmlspecialchars($adminPassword, ENT_QUOTES, 'UTF-8') . "</code></li>";
     echo "</ul>";
+    // v1.0.8: mark installed and try to disable this installer so it
+    // cannot be run again to wipe or recreate the database.
+    file_put_contents(__DIR__ . '/installed.lock', date('Y-m-d H:i:s'));
+    $disabled = @rename(__FILE__, __DIR__ . '/install.php.disabled');
     echo "<div class='alert alert-warning'>请登录后立即修改管理员密码！</div>";
+    if ($disabled) {
+        echo "<div class='alert alert-success'>安装程序已自动改名为 install.php.disabled，不会再被访问。</div>";
+    } else {
+        echo "<div class='alert alert-danger'>请手动删除 install.php，否则任何人都能再次打开安装程序。</div>";
+    }
     echo "<div class='d-flex gap-2'>";
     echo "<a href='/login' class='btn btn-primary'>去登录</a>";
     echo "<a href='/admin/settings' class='btn btn-outline-secondary'>设置品牌名</a>";
@@ -103,7 +119,8 @@ try {
     echo "</div></div>";
     
 } catch (Exception $e) {
-    echo "<div class='alert alert-danger'>安装失败：" . $e->getMessage() . "</div>";
+    error_log('yulan install failed: ' . $e->getMessage());
+    echo "<div class='alert alert-danger'>安装失败，请检查数据库配置与服务器错误日志。</div>";
 }
 
 echo "</div></body></html>";

@@ -1,16 +1,17 @@
 /* ==========================================================================
    Yulan Drive — 全局设计系统（前后台共用）
-   定位：现代专业云盘 + 现代 SaaS 管理后台
+   v1.0.8：去模板化——主色改用偏灰的钢蓝，不再是常见的亮蓝；
+   圆角收小、阴影压平，界面只做工具该做的事，不做营销展示。
    原则：细边框为主、轻阴影为辅；无渐变、无玻璃拟态、无装饰动画；
-        品牌蓝只用于强调；状态色只做状态表达。
+        品牌色只用于强调；状态色只做状态表达。
    说明：本文件为全站唯一设计体系，已合并原 style.css / drawer.css。
    ========================================================================== */
 
 :root {
   /* ---- 品牌与主色 ---- */
-  --primary: #2563EB;
-  --primary-hover: #1D4ED8;
-  --primary-soft: #EFF6FF;
+  --primary: #2F5D8A;
+  --primary-hover: #254A6E;
+  --primary-soft: #EAF0F7;
 
   /* ---- 背景与容器 ---- */
   --bg: #F8FAFC;
@@ -34,21 +35,21 @@
   --danger-soft: #FEF2F2;
 
   /* ---- 圆角 ---- */
-  --r-sm: 8px;        /* 按钮 / 输入框 */
-  --r-card: 12px;     /* 卡片 */
-  --r-modal: 16px;    /* 大型弹窗 */
+  --r-sm: 6px;        /* 按钮 / 输入框 */
+  --r-card: 8px;      /* 卡片 */
+  --r-modal: 10px;    /* 大型弹窗 */
   --r-pill: 999px;    /* 标签 / 进度条 */
 
   /* ---- 尺寸 ---- */
-  --nav-h: 64px;
+  --nav-h: 60px;
   --sidebar-w: 240px;
-  --btn-h: 40px;
-  --btn-h-sm: 34px;
+  --btn-h: 38px;
+  --btn-h-sm: 32px;
 
   /* ---- 阴影（轻） ---- */
   --shadow: 0 1px 2px rgba(15, 23, 42, .04);
-  --shadow-hover: 0 4px 12px rgba(15, 23, 42, .08);
-  --shadow-pop: 0 12px 32px rgba(15, 23, 42, .12);
+  --shadow-hover: 0 2px 6px rgba(15, 23, 42, .06);
+  --shadow-pop: 0 8px 24px rgba(15, 23, 42, .10);
 
   /* ---- 动效 ---- */
   --t-fast: .14s ease;
@@ -57,9 +58,9 @@
 
 /* 深色主题（保留原有切换能力） */
 [data-theme="dark"] {
-  --primary: #60A5FA;
-  --primary-hover: #93C5FD;
-  --primary-soft: #17233D;
+  --primary: #7FA8CC;
+  --primary-hover: #9DBFD9;
+  --primary-soft: #16273A;
   --bg: #0B1120;
   --card: #111827;
   --text: #E2E8F0;
@@ -74,8 +75,8 @@
   --danger: #F87171;
   --danger-soft: #2C1618;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3);
-  --shadow-hover: 0 4px 12px rgba(0, 0, 0, .38);
-  --shadow-pop: 0 12px 32px rgba(0, 0, 0, .5);
+  --shadow-hover: 0 2px 6px rgba(0, 0, 0, .32);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, .45);
 }
 
 /* ===================== 基础 ===================== */
@@ -85,9 +86,9 @@
 html { -webkit-text-size-adjust: 100%; }
 
 body {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
@@ -298,7 +299,7 @@ code {
 }
 textarea.form-control { height: auto; padding: 10px 12px; resize: vertical; min-height: 84px; line-height: 1.55; }
 select.form-control { padding-right: 32px; cursor: pointer; }
-.form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+.form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47, 93, 138, .14); }
 .form-control::placeholder { color: var(--text-3); }
 .form-control:disabled { background: var(--line-soft); color: var(--text-3); cursor: not-allowed; }
 .field { margin-bottom: 16px; }
@@ -363,7 +364,7 @@ select.form-control { padding-right: 32px; cursor: pointer; }
 }
 .alert-danger { background: var(--danger-soft); color: var(--danger); border-color: rgba(220, 38, 38, .18); }
 .alert-success { background: var(--success-soft); color: var(--success); border-color: rgba(22, 163, 74, .18); }
-.alert-info { background: var(--primary-soft); color: var(--primary); border-color: rgba(37, 99, 235, .16); }
+.alert-info { background: var(--primary-soft); color: var(--primary); border-color: rgba(47, 93, 138, .18); }
 .alert-warn { background: var(--warn-soft); color: var(--warn); border-color: rgba(217, 119, 6, .18); }
 
 /* ===================== 文件项 ===================== */
@@ -481,7 +482,7 @@ select.form-control { padding-right: 32px; cursor: pointer; }
 
 #dropMask, .drag-overlay {
   display: none; position: fixed; inset: 0; z-index: 1500;
-  background: rgba(37, 99, 235, .06);
+  background: rgba(47, 93, 138, .06);
   border: 2px dashed var(--primary);
   align-items: center; justify-content: center; flex-direction: column; gap: 10px;
   font-size: 15px; color: var(--primary); font-weight: 500;
@@ -607,7 +608,7 @@ select.form-control { padding-right: 32px; cursor: pointer; }
 #batch-actions {
   display: none; align-items: center; gap: 8px; flex-wrap: wrap;
   padding: 10px 14px; margin-bottom: 14px;
-  background: var(--primary-soft); border: 1px solid rgba(37, 99, 235, .18);
+  background: var(--primary-soft); border: 1px solid rgba(47, 93, 138, .20);
   border-radius: var(--r-card);
 }
 #batch-actions.on { display: flex; }
@@ -727,7 +728,7 @@ input[type="checkbox"] {
 }
 .search-box { padding: 0 12px; width: 200px; }
 .sort-select { padding: 0 10px; cursor: pointer; }
-.search-box:focus, .sort-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+.search-box:focus, .sort-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47, 93, 138, .14); }
 .toolbar .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .toolbar .actions form { display: flex; gap: 6px; min-width: 0; }
 
@@ -1037,7 +1038,7 @@ body.auth-body {
   background: var(--card); color: var(--text); font-size: 14px; font-family: inherit;
   cursor: pointer;
 }
-.form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); outline: none; }
+.form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47, 93, 138, .14); outline: none; }
 
 /* ===================== 其他组件 ===================== */
 

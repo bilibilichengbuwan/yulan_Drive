@@ -4,6 +4,12 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: SAMEORIGIN');
 header('Referrer-Policy: strict-origin-when-cross-origin');
+// v1.0.8: site-wide CSP. 'unsafe-inline' is kept only because the current
+// views use inline scripts/styles and CDN assets (Font Awesome, jsdelivr,
+// marked); it still blocks object/embed, foreign frames and data: exfil
+// destinations that the app never needs.
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; font-src 'self' https://cdnjs.cloudflare.com data:; connect-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'");
+header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
 
 $sensitivePaths = ['/config/', '/core/', '/models/', '/controllers/', '/views/', '/logs/', '/tmp/', '/public/uploads/', '/storage/'];
 foreach ($sensitivePaths as $sp) {
